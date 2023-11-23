@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grab_customer_app/controllers/home_controller.dart';
+import 'package:grab_customer_app/views/home/widget/custom_appbar_widget.dart';
+import 'package:grab_customer_app/views/home/widget/ride_options_widget.dart';
+import 'package:grab_customer_app/views/home/widget/top_share_location_card_widget.dart';
+import 'package:grab_customer_app/views/home/widget/where_to_widget.dart';
+import 'package:grab_customer_app/views/map/page/map_with_source_destination_field.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  HomePageState createState() => HomePageState();
+}
+
+class HomePageState extends State<HomePage> {
+  final HomeController _homeController = Get.find();
+
+  static const CameraPosition _defaultLocation = CameraPosition(
+    target: LatLng(10.762622, 106.660172),
+    zoom: 14.4746,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _homeController.getCurrentLocation();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: ListView(
+            children: [
+              const SizedBox(
+                height: 15,
+              ),
+              customAppBarWidget(),
+              const SizedBox(
+                height: 15,
+              ),
+              topShareLocationCardWidget(_homeController),
+              const SizedBox(height: 15),
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => const MapWithSourceDestinationField(
+                      newCameraPosition: _defaultLocation,
+                      defaultCameraPosition: _defaultLocation));
+                },
+                child: rideOptionsWidget(),
+              ),
+              const SizedBox(height: 15),
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => const MapWithSourceDestinationField(
+                      newCameraPosition: _defaultLocation,
+                      defaultCameraPosition: _defaultLocation));
+                },
+                child: whereToWidget(),
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.grey[100]),
+                  child: const FaIcon(
+                    FontAwesomeIcons.solidStar,
+                    color: Colors.black,
+                    size: 18,
+                  ),
+                ),
+                title: const Text(
+                  "Choose saved place",
+                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                ),
+                trailing: const FaIcon(
+                  FontAwesomeIcons.arrowRight,
+                  color: Colors.black,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              const Text(
+                "Around You",
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(15)),
+                    color: Colors.grey[100]),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                  child: Obx(
+                        () => Visibility(
+                      visible: _homeController.currentLat.value != 0.0,
+                      child: GoogleMap(
+                        onTap: (LatLng latLng) {
+                          var currentLat = _homeController.currentLat.value;
+                          var currentLng = _homeController.currentLng.value;
+                          CameraPosition newCameraPos = CameraPosition(
+                            target: LatLng(currentLat, currentLng),
+                            zoom: 14.4746,
+                          );
+                          Get.to(() => MapWithSourceDestinationField(
+                              newCameraPosition: newCameraPos,
+                              defaultCameraPosition: _defaultLocation));
+                        },
+                        mapType: MapType.normal,
+                        initialCameraPosition: _defaultLocation,
+                        myLocationButtonEnabled: false,
+                        myLocationEnabled: true,
+                        zoomControlsEnabled: false,
+                        zoomGesturesEnabled: true,
+                        onMapCreated: (GoogleMapController controller) {
+                          _homeController.googleMapController.complete(controller);
+                          CameraPosition newCameraPos = CameraPosition(
+                            target: LatLng(_homeController.currentLat.value,
+                                _homeController.currentLng.value),
+                            zoom: 14.4746,
+                          );
+                          controller.animateCamera(
+                              CameraUpdate.newCameraPosition(newCameraPos));
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

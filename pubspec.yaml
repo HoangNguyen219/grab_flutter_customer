@@ -1,0 +1,53 @@
+name: grab_customer_app
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.4 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.6.1
+  http: ^1.1.0
+  firebase_auth: ^4.5.0
+  firebase_core: ^2.22.0
+  cupertino_icons: ^1.0.2
+  font_awesome_flutter: ^9.2.0
+  socket_io_client: ^2.0.3+1
+  shared_preferences: ^2.0.12
+  intl: ^0.17.0
+
+
+  #map
+  google_maps_flutter: ^2.1.1
+  geolocator: ^8.0.3
+  flutter_polyline_points: ^2.0.0
+
+  #network connectivity
+  connectivity_plus: ^2.2.0
+
+  # for calling
+  flutter_phone_direct_caller: ^2.1.0
+
+  flutter_dotenv: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - .env
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.png"
