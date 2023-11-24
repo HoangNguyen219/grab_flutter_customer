@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/controllers/home_controller.dart';
 import 'package:grab_customer_app/views/home/widget/custom_appbar_widget.dart';
@@ -42,37 +39,23 @@ class HomePageState extends State<HomePage> {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: ListView(
             children: [
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
               customAppBarWidget(),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
               topShareLocationCardWidget(_homeController),
               const SizedBox(height: 15),
               GestureDetector(
-                onTap: () {
-                  Get.to(() => const MapWithSourceDestinationField(
-                      newCameraPosition: _defaultLocation,
-                      defaultCameraPosition: _defaultLocation));
-                },
+                onTap: () => _openMapWithCameraPosition(_homeController.currentLat.value, _homeController.currentLng.value),
                 child: rideOptionsWidget(),
               ),
               const SizedBox(height: 15),
               GestureDetector(
-                onTap: () {
-                  Get.to(() => const MapWithSourceDestinationField(
-                      newCameraPosition: _defaultLocation,
-                      defaultCameraPosition: _defaultLocation));
-                },
+                onTap: () => _openMapWithCameraPosition(_homeController.currentLat.value, _homeController.currentLng.value),
                 child: whereToWidget(),
               ),
               ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: Colors.grey[100]),
+                leading: CircleAvatar(
+                  backgroundColor: Colors.grey[100],
                   child: const FaIcon(
                     FontAwesomeIcons.solidStar,
                     color: Colors.black,
@@ -89,57 +72,35 @@ class HomePageState extends State<HomePage> {
                   size: 18,
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
               const Text(
                 "Around You",
                 style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
               ),
-              const SizedBox(
-                height: 15,
-              ),
               Container(
                 height: 200,
                 decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(15)),
-                    color: Colors.grey[100]),
+                  borderRadius: const BorderRadius.all(Radius.circular(15)),
+                  color: Colors.grey[100],
+                ),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(15)),
-                  child: Obx(
-                        () => Visibility(
-                      visible: _homeController.currentLat.value != 0.0,
+                  child: Obx(() {
+                    final isVisible = _homeController.currentLat.value != 0.0;
+                    return Visibility(
+                      visible: isVisible,
                       child: GoogleMap(
-                        onTap: (LatLng latLng) {
-                          var currentLat = _homeController.currentLat.value;
-                          var currentLng = _homeController.currentLng.value;
-                          CameraPosition newCameraPos = CameraPosition(
-                            target: LatLng(currentLat, currentLng),
-                            zoom: 14.4746,
-                          );
-                          Get.to(() => MapWithSourceDestinationField(
-                              newCameraPosition: newCameraPos,
-                              defaultCameraPosition: _defaultLocation));
-                        },
+                        onTap: _handleMapTap,
                         mapType: MapType.normal,
                         initialCameraPosition: _defaultLocation,
                         myLocationButtonEnabled: false,
                         myLocationEnabled: true,
                         zoomControlsEnabled: false,
                         zoomGesturesEnabled: true,
-                        onMapCreated: (GoogleMapController controller) {
-                          _homeController.googleMapController.complete(controller);
-                          CameraPosition newCameraPos = CameraPosition(
-                            target: LatLng(_homeController.currentLat.value,
-                                _homeController.currentLng.value),
-                            zoom: 14.4746,
-                          );
-                          controller.animateCamera(
-                              CameraUpdate.newCameraPosition(newCameraPos));
-                        },
+                        onMapCreated: (GoogleMapController controller) => _homeController.googleMapController.complete(controller),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                 ),
               ),
             ],
@@ -147,5 +108,16 @@ class HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void _openMapWithCameraPosition(double lat, double lng) {
+    final newCameraPos = CameraPosition(target: LatLng(lat, lng), zoom: 14.4746);
+    Get.to(() => MapWithSourceDestinationField(newCameraPosition: newCameraPos, defaultCameraPosition: _defaultLocation));
+  }
+
+  void _handleMapTap(LatLng latLng) {
+    final currentLat = _homeController.currentLat.value;
+    final currentLng = _homeController.currentLng.value;
+    _openMapWithCameraPosition(currentLat, currentLng);
   }
 }

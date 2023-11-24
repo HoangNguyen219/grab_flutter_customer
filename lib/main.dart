@@ -5,12 +5,12 @@ import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:grab_customer_app/common/internet/internet_controller.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
-import 'package:grab_customer_app/controllers/customer_controller.dart';
 import 'package:grab_customer_app/controllers/home_controller.dart';
 import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/controllers/ride_controller.dart';
 import 'package:grab_customer_app/controllers/socket_controller.dart';
 import 'package:grab_customer_app/services/auth_api_service.dart';
+import 'package:grab_customer_app/services/map_api_service.dart';
 import 'package:grab_customer_app/services/ride_api_service.dart';
 import 'package:grab_customer_app/services/socket_service.dart';
 import 'package:grab_customer_app/views/auth/page/phone_verification_page.dart';
@@ -40,10 +40,9 @@ class MyApp extends StatelessWidget {
       ),
       home: Obx(() {
         Get.put(InternetController());
-        Get.put(SocketController(SocketService(dotenv.env['SOCKET_URL'] ?? "ws://10.0.2.2:6666")));
-        Get.put(CustomerController());
         Get.put(HomeController());
-        Get.put(MapController());
+        Get.put(MapController(MapService(dotenv.env['MAP_URL'] ?? "https://maps.googleapis.com")));
+        Get.put(SocketController(SocketService(dotenv.env['SOCKET_URL'] ?? "ws://10.0.2.2:6666")));
         Get.put(RideController(RideService(dotenv.env['API_URL'] ?? "http://10.0.2.2:6666")));
         return authController.customerId.value != 0 ? const HomePage() : const PhoneVerificationPage();
       }),

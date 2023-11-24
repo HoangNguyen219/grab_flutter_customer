@@ -20,7 +20,7 @@ dependencies:
   socket_io_client: ^2.0.3+1
   shared_preferences: ^2.0.12
   intl: ^0.17.0
-
+  geocoding: ^2.0.2   # place name to latlng
 
   #map
   google_maps_flutter: ^2.1.1

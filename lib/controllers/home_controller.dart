@@ -5,26 +5,36 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/utils/location_service.dart';
 
 class HomeController extends GetxController {
-  var currentLat = 10.762622.obs;
-  var currentLng = 106.660172.obs;
+  final currentLat = 0.0.obs;
+  final currentLng = 0.0.obs;
 
   final Completer<GoogleMapController> googleMapController = Completer();
 
-  void getCurrentLocation() async {
+  @override
+  void onInit() {
+    super.onInit();
+    _loadCurrentPosition();
+  }
+
+  Future<void> _loadCurrentPosition() async {
     final position = await LocationService.getLocation();
 
     if (position == null) {
       // Handle the case where the location permission is denied or null
       return;
     }
+    currentLat.value = position.latitude;
+    currentLng.value = position.longitude;
+  }
 
+  void getCurrentLocation() async {
     try {
       final controller = await googleMapController.future;
 
       controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
-            target: LatLng(position.latitude, position.longitude),
+            target: LatLng(currentLat.value, currentLng.value),
             zoom: 18.0,
           ),
         ),

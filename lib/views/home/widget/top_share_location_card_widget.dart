@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:grab_customer_app/controllers/home_controller.dart';
 
-topShareLocationCardWidget(HomeController mapController) {
+topShareLocationCardWidget(HomeController homeController) {
   return Container(
     padding: const EdgeInsets.all(22),
     decoration: const BoxDecoration(
@@ -33,7 +33,7 @@ topShareLocationCardWidget(HomeController mapController) {
             ),
             GestureDetector(
               onTap: () {
-                mapController.getCurrentLocation();
+                homeController.getCurrentLocation();
               },
               child: const Row(
                 children: [

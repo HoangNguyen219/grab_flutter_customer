@@ -34,20 +34,28 @@ class Ride {
     Map<String, dynamic>? startLoc;
     Map<String, dynamic>? endLoc;
 
-    List<String> startLocationValues =
-        (json[RideConstants.startLocation] as String).split(RideConstants.splitCharacter);
-    double startLat = double.parse(startLocationValues[0]);
-    double startLong = double.parse(startLocationValues[1]);
-    startLoc = {RideConstants.lat: startLat, RideConstants.long: startLong};
+    if (json[RideConstants.startLocation] is String) {
+      List<String> startLocationValues =
+          (json[RideConstants.startLocation] as String).split(RideConstants.splitCharacter);
+      double startLat = double.parse(startLocationValues[0]);
+      double startLong = double.parse(startLocationValues[1]);
+      startLoc = {RideConstants.lat: startLat, RideConstants.long: startLong};
+    } else if (json[RideConstants.startLocation] is Map<String, dynamic>) {
+      startLoc = Map<String, dynamic>.from(json[RideConstants.startLocation]);
+    }
 
-    List<String> endLocationValues = (json[RideConstants.endLocation] as String).split(RideConstants.splitCharacter);
-    double endLat = double.parse(endLocationValues[0]);
-    double endLong = double.parse(endLocationValues[1]);
-    endLoc = {RideConstants.lat: endLat, RideConstants.long: endLong};
+    if (json[RideConstants.endLocation] is String) {
+      List<String> endLocationValues = (json[RideConstants.endLocation] as String).split(RideConstants.splitCharacter);
+      double endLat = double.parse(endLocationValues[0]);
+      double endLong = double.parse(endLocationValues[1]);
+      endLoc = {RideConstants.lat: endLat, RideConstants.long: endLong};
+    } else if (json[RideConstants.endLocation] is Map<String, dynamic>) {
+      endLoc = Map<String, dynamic>.from(json[RideConstants.endLocation]);
+    }
 
     return Ride(
       id: json[ID],
-      driverId: json[RideConstants.customerId],
+      driverId: json[RideConstants.driverId],
       customerId: json[RideConstants.customerId],
       startLocation: startLoc,
       endLocation: endLoc,

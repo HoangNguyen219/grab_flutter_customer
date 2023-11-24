@@ -14,18 +14,13 @@ class MapWithSourceDestinationField extends StatefulWidget {
   final CameraPosition newCameraPosition;
 
   const MapWithSourceDestinationField(
-      {required this.newCameraPosition,
-      required this.defaultCameraPosition,
-      super.key});
+      {required this.newCameraPosition, required this.defaultCameraPosition, super.key});
 
   @override
-  _MapWithSourceDestinationFieldState createState() =>
-      _MapWithSourceDestinationFieldState();
+  MapWithSourceDestinationFieldState createState() => MapWithSourceDestinationFieldState();
 }
 
-class _MapWithSourceDestinationFieldState
-    extends State<MapWithSourceDestinationField> {
-
+class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationField> {
   final sourcePlaceController = TextEditingController();
   final destinationController = TextEditingController();
 
@@ -44,7 +39,7 @@ class _MapWithSourceDestinationFieldState
     return WillPopScope(
       onWillPop: () async {
         Get.offAll(() => const HomePage());
-        _mapController.subscription.cancel();
+        // _mapController.subscription.cancel();
         return true;
       },
       child: Scaffold(
@@ -60,7 +55,7 @@ class _MapWithSourceDestinationFieldState
                         initialCameraPosition: widget.defaultCameraPosition,
                         myLocationButtonEnabled: true,
                         myLocationEnabled: true,
-                        markers: _mapController.markers.value.toSet(),
+                        markers: _mapController.markers.toSet(),
                         polylines: {
                           Polyline(
                               polylineId: const PolylineId("polyLine"),
@@ -70,36 +65,29 @@ class _MapWithSourceDestinationFieldState
                               startCap: Cap.roundCap,
                               endCap: Cap.roundCap,
                               geodesic: true,
-                              points:
-                                  _mapController.polylineCoordinates.value),
+                              points: _mapController.polylineCoordinates),
                           Polyline(
-                              polylineId:
-                                  const PolylineId("polyLineForAcptDriver"),
+                              polylineId: const PolylineId("polyLineForAcptDriver"),
                               color: Colors.black,
                               width: 6,
                               jointType: JointType.round,
                               startCap: Cap.roundCap,
                               endCap: Cap.roundCap,
                               geodesic: true,
-                              points: _mapController
-                                  .polylineCoordinatesForAcceptDriver.value),
+                              points: _mapController.polylineCoordinatesForAcceptDriver),
                         },
                         zoomControlsEnabled: false,
                         zoomGesturesEnabled: true,
                         onMapCreated: (GoogleMapController controller) {
                           _mapController.controller.complete(controller);
-                          controller.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                  widget.newCameraPosition));
+                          controller.animateCamera(CameraUpdate.newCameraPosition(widget.newCameraPosition));
                         },
                       ),
                     ),
-                    // Visibility(
-                    //   visible:
-                    //       _mapController.isReadyToDisplayAvlDriver.value,
-                    //   child: const SizedBox(
-                    //       height: 250, child: MapConfirmationBottomSheet()),
-                    // )
+                    Visibility(
+                      visible: _mapController.isReadyToDisplayAvlDriver.value,
+                      child: const SizedBox(height: 250, child: MapConfirmationBottomSheet()),
+                    )
                   ],
                 ),
               ),
@@ -116,13 +104,12 @@ class _MapWithSourceDestinationFieldState
                           children: [
                             Container(
                               padding: const EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                  shape: BoxShape.circle, color: Colors.white),
+                              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                               child: GestureDetector(
                                 onTap: () {
-                                  // _grabMapController.subscription.cancel();
+                                  // _mapController.subscription.cancel();
                                   Get.offAll(() => const HomePage());
-                                  _mapController.subscription.cancel();
+                                  // _mapController.subscription.cancel();
                                 },
                                 child: const FaIcon(
                                   FontAwesomeIcons.arrowLeft,
@@ -133,51 +120,36 @@ class _MapWithSourceDestinationFieldState
                               height: 10,
                             ),
                             Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              margin: const EdgeInsets.symmetric(horizontal: 15),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12))),
+                                  color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(12))),
                               child: TextField(
-                                // onChanged: (val) {
-                                //   _mapController.getPredictions(
-                                //       val, 'source');
-                                // },
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Enter Source Place"),
-                                controller: sourcePlaceController
-                                  ..text =
-                                      _mapController.sourcePlaceName.value,
+                                onChanged: (val) {
+                                  _mapController.getPredictions(val, 'source');
+                                },
+                                decoration:
+                                    const InputDecoration(border: InputBorder.none, hintText: "Enter Source Place"),
+                                controller: sourcePlaceController..text = _mapController.sourcePlaceName.value,
                               ),
                             ),
                             const SizedBox(
                               height: 10,
                             ),
                             Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 15),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
+                              margin: const EdgeInsets.symmetric(horizontal: 15),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12))),
+                                  color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(12))),
                               child: TextField(
-                                // onChanged: (val) {
-                                //   _mapController.getPredictions(
-                                //       val, 'destination');
-                                // },
+                                onChanged: (val) {
+                                  _mapController.getPredictions(val, 'destination');
+                                },
                                 decoration: const InputDecoration(
                                   hintText: "Enter Destination Place",
                                   border: InputBorder.none,
                                 ),
-                                controller: destinationController
-                                  ..text = _mapController
-                                      .destinationPlaceName.value,
+                                controller: destinationController..text = _mapController.destinationPlaceName.value,
                               ),
                             ),
                           ],
@@ -185,51 +157,32 @@ class _MapWithSourceDestinationFieldState
                       ),
                     ),
                   ),
-                  //if (_grabMapController.grabMapPredictionData.isNotEmpty)
                   Expanded(
                     child: Obx(
                       () => Visibility(
-                        visible:
-                            _mapController.mapPredictionData.isNotEmpty,
+                        visible: _mapController.mapPredictionData.isNotEmpty,
                         child: Container(
                           color: Colors.white,
                           child: ListView.builder(
-                              //shrinkWrap: true,
-                              itemCount: _mapController
-                                  .mapPredictionData.length,
+                              // shrinkWrap: true,
+                              itemCount: _mapController.mapPredictionData.length,
                               itemBuilder: (context, index) {
                                 return ListTile(
-                                  // onTap: () async {
-                                  //   FocusScope.of(context).unfocus();
-                                  //   if (_mapController
-                                  //           .predictionListType.value ==
-                                  //       'source') {
-                                  //     _mapController
-                                  //         .setPlaceAndGetLocationDetailsAndDirection(
-                                  //             sourcePlace: _mapController
-                                  //                 .mapPredictionData[index]
-                                  //                 .mainText
-                                  //                 .toString(),
-                                  //             destinationPlace: "");
-                                  //   } else {
-                                  //     _mapController
-                                  //         .setPlaceAndGetLocationDetailsAndDirection(
-                                  //             sourcePlace: "",
-                                  //             destinationPlace:
-                                  //                 _mapController
-                                  //                     .mapPredictionData[
-                                  //                         index]
-                                  //                     .mainText
-                                  //                     .toString());
-                                  //   }
-                                  // },
-                                  title: Text(_mapController
-                                      .mapPredictionData[index].mainText
-                                      .toString()),
-                                  subtitle: Text(_mapController
-                                      .mapPredictionData[index]
-                                      .secondaryText
-                                      .toString()),
+                                  onTap: () async {
+                                    FocusScope.of(context).unfocus();
+                                    if (_mapController.predictionListType.value == 'source') {
+                                      _mapController.setPlaceAndGetLocationDetailsAndDirection(
+                                          sourcePlace: _mapController.mapPredictionData[index].mainText.toString(),
+                                          destinationPlace: "");
+                                    } else {
+                                      _mapController.setPlaceAndGetLocationDetailsAndDirection(
+                                          sourcePlace: "",
+                                          destinationPlace:
+                                              _mapController.mapPredictionData[index].mainText.toString());
+                                    }
+                                  },
+                                  title: Text(_mapController.mapPredictionData[index].mainText.toString()),
+                                  subtitle: Text(_mapController.mapPredictionData[index].secondaryText.toString()),
                                   trailing: const Icon(Icons.check),
                                 );
                               }),

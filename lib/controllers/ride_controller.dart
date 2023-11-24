@@ -34,35 +34,20 @@ class RideController extends GetxController {
             : RideState.isCompleted;
   }
 
-  // Future<void> createBookingNow(Map<String, dynamic> rideData) async {
-  //   try {
-  //     final result = await _rideService.createBookingNow(rideData);
-  //
-  //     if (result[STATUS] == true) {
-  //       // Handle successful ride creation
-  //     } else {
-  //       // Handle failed ride creation
-  //     }
-  //   } catch (e) {
-  //     // Handle errors
-  //     print('Error creating booking now: $e');
-  //   }
-  // }
+  Future<void> createBookingNow(Map<String, dynamic> rideData) async {
+    try {
+      final result = await _rideService.createBookingNow(rideData);
 
-  // Future<void> scheduleBookingLater(Map<String, dynamic> rideData) async {
-  //   try {
-  //     final result = await _rideService.scheduleBookingLater(rideData);
-  //
-  //     if (result[STATUS] == true) {
-  //       // Handle successful ride scheduling
-  //     } else {
-  //       // Handle failed ride scheduling
-  //     }
-  //   } catch (e) {
-  //     // Handle errors
-  //     print('Error scheduling booking later: $e');
-  //   }
-  // }
+      if (result[STATUS] == true) {
+        // Handle successful ride creation
+      } else {
+        // Handle failed ride creation
+      }
+    } catch (e) {
+      // Handle errors
+      print('Error creating booking now: $e');
+    }
+  }
 
   Future<void> cancelRide(String rideId) async {
     try {
@@ -76,58 +61,6 @@ class RideController extends GetxController {
     } catch (e) {
       // Handle errors
       print('Error canceling ride: $e');
-    }
-  }
-
-  Future<void> acceptRide(Ride ride) async {
-    try {
-      final result = await _rideService.acceptRide(ride.id!, _authController.customerId.value);
-
-      if (result[STATUS] == true) {
-        _socketController.acceptRide(ride);
-        rideState.value = RideState.isAccepted;
-        acceptedRide.value = ride;
-      } else {
-        // Handle failed ride acceptance
-      }
-    } catch (e) {
-      // Handle errors
-      print('Error accepting ride: $e');
-    }
-  }
-
-  Future<void> pickRide(Ride ride) async {
-    try {
-      final result = await _rideService.pickRide(ride.id!);
-
-      if (result[STATUS] == true) {
-        // Handle successful ride picking
-        _socketController.pickRide(ride);
-        rideState.value = RideState.isArrived;
-      } else {
-        // Handle failed ride picking
-      }
-    } catch (e) {
-      // Handle errors
-      print('Error picking ride: $e');
-    }
-  }
-
-  Future<void> completeRide(Ride ride) async {
-    try {
-      final result = await _rideService.completeRide(ride.id!);
-
-      if (result[STATUS] == true) {
-        // Handle successful ride completion
-        _socketController.completeRide(ride);
-        rideState.value = RideState.isCompleted;
-        acceptedRide.value = Ride();
-      } else {
-        // Handle failed ride completion
-      }
-    } catch (e) {
-      // Handle errors
-      print('Error completing ride: $e');
     }
   }
 
