@@ -5,11 +5,21 @@ import 'package:grab_customer_app/controllers/ride_controller.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/views/history/widget/ride_history_tile_widget.dart';
 
-class RideHistoryPage extends StatelessWidget {
+class RideHistoryPage extends StatefulWidget {
+  const RideHistoryPage({super.key});
+
+  @override
+  _RideHistoryPageState createState() => _RideHistoryPageState();
+}
+
+class _RideHistoryPageState extends State<RideHistoryPage> {
   final RideController rideController = Get.find();
 
-  RideHistoryPage({super.key});
-
+  @override
+  void initState() {
+    rideController.getRides();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

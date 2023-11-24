@@ -14,7 +14,7 @@ customAppBarWidget() {
       ),
       GestureDetector(
         onTap: () {
-          Get.to(() => RideHistoryPage());
+          Get.to(() => const RideHistoryPage());
         },
         child: const FaIcon(
           FontAwesomeIcons.solidUserCircle,

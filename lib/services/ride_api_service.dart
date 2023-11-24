@@ -10,7 +10,7 @@ class RideService extends BaseApiService {
     return await postRequest('api/rides', ride.toJson());
   }
 
-  Future<Map<String, dynamic>> cancelRide(String rideId) async {
+  Future<Map<String, dynamic>> cancelRide(int rideId) async {
     final Map<String, dynamic> body = {RideConstants.rideId: rideId};
     return await postRequest('api/rides/cancel', body);
   }

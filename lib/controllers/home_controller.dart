@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grab_customer_app/controllers/auth_controller.dart';
+import 'package:grab_customer_app/controllers/socket_controller.dart';
 import 'package:grab_customer_app/utils/location_service.dart';
 
 class HomeController extends GetxController {
@@ -9,6 +11,8 @@ class HomeController extends GetxController {
   final currentLng = 0.0.obs;
 
   final Completer<GoogleMapController> googleMapController = Completer();
+  final SocketController _socketController = Get.find();
+  final AuthController _authController = Get.find();
 
   @override
   void onInit() {
@@ -25,6 +29,7 @@ class HomeController extends GetxController {
     }
     currentLat.value = position.latitude;
     currentLng.value = position.longitude;
+    _socketController.addCustomer(_authController.customerId.value, position);
   }
 
   void getCurrentLocation() async {

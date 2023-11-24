@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/utils/constants/app_constants.dart';
 import 'package:intl/intl.dart';
@@ -26,60 +27,51 @@ class _RideHistoryTileState extends State<RideHistoryTile> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        debugPrint('Received click');
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: widget.ride.status == COMPLETED
-                            ? MaterialStateProperty.all(Colors.green)
-                            : widget.ride.status == IN_PROGRESS
-                                ? MaterialStateProperty.all(Colors.orange)
-                                : MaterialStateProperty.all(Colors.blue),
-                      ),
-                      child: widget.ride.status == COMPLETED
-                          ? const Text(COMPLETED)
-                          : widget.ride.status == IN_PROGRESS
-                              ? const Text('ONGOING')
-                              : const Text("WAITING"),
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 6),
-                          child: Text(DateFormat('dd-MM-yy hh:mm').format(widget.ride.startTime!)),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          debugPrint('Received click');
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: widget.ride.status == COMPLETED
+                              ? MaterialStateProperty.all(Colors.green)
+                              : widget.ride.status == IN_PROGRESS
+                                  ? MaterialStateProperty.all(Colors.orange)
+                                  : MaterialStateProperty.all(Colors.blue),
                         ),
-                        // Visibility(
-                        //   visible: widget.ride.tripHistoryModel.rating != 0,
-                        //   child: Container(
-                        //       width: 30,
-                        //       height: 20,
-                        //       alignment: Alignment.center,
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(7),
-                        //         color: Colors.green[700],
-                        //       ),
-                        //       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        //         Text(widget.ride.tripHistoryModel.rating.toString(),
-                        //             style: const TextStyle(
-                        //               color: Colors.white,
-                        //               fontSize: 10,
-                        //               fontWeight: FontWeight.bold,
-                        //             )),
-                        //         const SizedBox(width: 1),
-                        //         const Icon(
-                        //           Icons.star,
-                        //           color: Colors.white,
-                        //           size: 10.0,
-                        //         )
-                        //       ])),
-                        // ),
-                      ],
-                    ),
-                  ],
+                        child: widget.ride.status == COMPLETED
+                            ? const Text(COMPLETED)
+                            : widget.ride.status == IN_PROGRESS
+                                ? const Text('ONGOING')
+                                : const Text("WAITING"),
+                      ),
+                      if (widget.ride.status == IN_PROGRESS)
+                        GestureDetector(
+                          onTap: () {
+                            // Get.to(() =>
+                            //     GrabMapLiveTrackingPage());
+                          },
+                          child: const Text(
+                            "Track",
+                            style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: (widget.ride.startTime != null)
+                                ? Text(DateFormat('dd-MM-yy hh:mm').format(widget.ride.startTime!))
+                                : const Text(""),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

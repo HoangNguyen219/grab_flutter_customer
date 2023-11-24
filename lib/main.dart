@@ -40,9 +40,9 @@ class MyApp extends StatelessWidget {
       ),
       home: Obx(() {
         Get.put(InternetController());
-        Get.put(HomeController());
         Get.put(MapController(MapService(dotenv.env['MAP_URL'] ?? "https://maps.googleapis.com")));
         Get.put(SocketController(SocketService(dotenv.env['SOCKET_URL'] ?? "ws://10.0.2.2:6666")));
+        Get.put(HomeController());
         Get.put(RideController(RideService(dotenv.env['API_URL'] ?? "http://10.0.2.2:6666")));
         return authController.customerId.value != 0 ? const HomePage() : const PhoneVerificationPage();
       }),

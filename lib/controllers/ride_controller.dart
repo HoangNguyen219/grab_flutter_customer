@@ -54,12 +54,13 @@ class RideController extends GetxController {
     }
   }
 
-  Future<void> cancelRide(String rideId) async {
+  Future<void> cancelRide(Ride ride) async {
     try {
-      final result = await _rideService.cancelRide(rideId);
+      final result = await _rideService.cancelRide(ride.id!);
 
       if (result[STATUS] == true) {
         // Handle successful ride cancellation
+        _socketController.cancelRide(ride);
       } else {
         // Handle failed ride cancellation
       }
@@ -103,6 +104,7 @@ class RideController extends GetxController {
 
         // Return the list of Ride objects
         isLoading.value = false;
+        rides.sort((a, b) => (b.startTime ?? DateTime.now()).compareTo(a.startTime ?? DateTime.now()));
         rideHistoryList.value = rides;
         return;
       } else {

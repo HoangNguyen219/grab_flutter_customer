@@ -21,6 +21,7 @@ enum BookingState {
   isReadyToBook,
   isBooked,
   isAccepted,
+  isArrived
 }
 
 class MapController extends GetxController {

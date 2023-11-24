@@ -5,7 +5,7 @@ import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/services/socket_service.dart';
-import 'package:grab_customer_app/utils/location_service.dart';
+import 'package:grab_customer_app/views/history/page/ride_history_page.dart';
 
 class SocketController extends GetxController {
   final SocketService _socketService;
@@ -19,25 +19,22 @@ class SocketController extends GetxController {
   }
 
   Future<void> initSocket() async {
-    _socketService.connect(
-      onOnlineDriver: (Driver driver) {
-        onlineDrivers.add(driver);
-        _mapController.updateAvailableDrivers(onlineDrivers);
-      },
-      onOfflineDriver: (driverId) {
-        onlineDrivers.removeWhere((onlineDriver) => onlineDriver.driverId == driverId);
-      },
-      onAccept: (Driver driver) {
-        _mapController.bookingState.value = BookingState.isAccepted;
-        _mapController.acceptedDriver.value = driver;
-        _mapController.drawPathFromDriver();
-      }
-    );
-    final location = await LocationService.getLocation();
-    if (location == null) {
-      return;
-    }
-    addCustomer(_authController.customerId.value, location);
+    _socketService.connect(onOnlineDriver: (Driver driver) {
+      onlineDrivers.add(driver);
+      _mapController.updateAvailableDrivers(onlineDrivers);
+    }, onOfflineDriver: (driverId) {
+      onlineDrivers.removeWhere((onlineDriver) => onlineDriver.driverId == driverId);
+    }, onAccept: (Driver driver) {
+      _mapController.bookingState.value = BookingState.isAccepted;
+      _mapController.acceptedDriver.value = driver;
+      _mapController.drawPathFromDriver();
+    }, onPick: () {
+      _mapController.bookingState.value = BookingState.isArrived;
+      Get.snackbar(
+          "Driver arrived!", "Now you can track from tripHistory page!",
+          snackPosition: SnackPosition.BOTTOM);
+      Get.to(() => const RideHistoryPage());
+    });
   }
 
   void closeSocket() {

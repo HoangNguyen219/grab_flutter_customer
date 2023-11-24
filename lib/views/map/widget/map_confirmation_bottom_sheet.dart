@@ -44,7 +44,6 @@ class MapConfirmationBottomSheet extends StatelessWidget {
                 ],
               ),
             ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -64,7 +63,8 @@ class MapConfirmationBottomSheet extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                const Text("GrabCar",
+                const Text(
+                  "GrabCar",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Text(
@@ -76,24 +76,60 @@ class MapConfirmationBottomSheet extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
+            if (mapController.bookingState.value == BookingState.isBooked)
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    "Finding Driver...",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            if (mapController.bookingState.value == BookingState.isAccepted)
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    "Driver is coming...",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CustomElevatedButton(
-                  onPressed: () async {
-                    await rideController.createBookingNow(mapController.rideRequest.value);
-                  },
-                  text: 'BOOK', color: Colors.green,
-                ),
-                CustomElevatedButton(
-                  onPressed: () async {
-                    mapController.chooseOtherTrip();
-                  },
-                  text: 'CHOOSE OTHER TRIP', color: Colors.lightBlue,
-                )
+                if (mapController.bookingState.value == BookingState.isReadyToBook)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomElevatedButton(
+                        onPressed: () async {
+                          await rideController.createBookingNow(mapController.rideRequest.value);
+                        },
+                        text: 'BOOK',
+                        color: Colors.green,
+                      ),
+                      const SizedBox(width: 10), // Adding space between buttons
+                      CustomElevatedButton(
+                        onPressed: () async {
+                          mapController.chooseOtherTrip();
+                        },
+                        text: 'CHOOSE OTHER TRIP',
+                        color: Colors.lightBlue,
+                      ),
+                    ],
+                  ),
+                if (mapController.bookingState.value != BookingState.isReadyToBook)
+                  CustomElevatedButton(
+                    onPressed: () async {
+                      await rideController.cancelRide(mapController.rideRequest.value);
+                    },
+                    text: 'CANCEL BOOKING',
+                    color: Colors.red,
+                  ),
               ],
-            ),
-
+            )
           ],
         ),
       ),
