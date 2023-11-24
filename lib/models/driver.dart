@@ -1,20 +1,19 @@
 import 'package:grab_customer_app/utils/constants/ride_constants.dart';
 
 class Driver {
-  final int driverId;
+  final int? driverId;
   final Map<String, dynamic>? location;
 
   Driver({
-    required this.driverId,
-    required this.location,
+    this.driverId,
+    this.location,
   });
 
   factory Driver.fromJson(Map<String, dynamic> json) {
     Map<String, dynamic>? loc;
 
     if (json[RideConstants.location] is String) {
-      List<String> startLocationValues =
-      (json[RideConstants.location] as String).split(RideConstants.splitCharacter);
+      List<String> startLocationValues = (json[RideConstants.location] as String).split(RideConstants.splitCharacter);
       double startLat = double.parse(startLocationValues[0]);
       double startLong = double.parse(startLocationValues[1]);
       loc = {RideConstants.lat: startLat, RideConstants.long: startLong};
@@ -22,16 +21,10 @@ class Driver {
       loc = Map<String, dynamic>.from(json[RideConstants.location]);
     }
 
-    return Driver(
-      driverId: json[RideConstants.driverId],
-      location: loc
-    );
+    return Driver(driverId: json[RideConstants.driverId], location: loc);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      RideConstants.driverId: driverId,
-      RideConstants.location: location
-    };
+    return {RideConstants.driverId: driverId, RideConstants.location: location};
   }
 }

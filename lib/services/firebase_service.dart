@@ -17,7 +17,7 @@ class FirebaseService {
         verificationCompleted: verificationCompleted,
         verificationFailed: (FirebaseAuthException e) {
           if (verificationFailed != null) {
-            verificationFailed((e.message ?? "Unknown error") as FirebaseAuthException);
+            verificationFailed((e));
           }
         },
         codeSent: codeSent,

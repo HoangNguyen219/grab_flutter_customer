@@ -13,7 +13,7 @@ class SocketService {
 
   SocketService(this.baseUrl);
 
-  void connect({Function(Driver driver)? onOnlineDriver, Function(int)? onOfflineDriver}) {
+  void connect({Function(Driver driver)? onOnlineDriver, Function(int)? onOfflineDriver,  Function(Driver driver)? onAccept}) {
     socket = io.io(baseUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -39,7 +39,8 @@ class SocketService {
     });
 
     socket.on('accept', (data) {
-      // Handle accept event
+      var dataDecode = json.decode(data);
+      onAccept?.call(Driver.fromJson(dataDecode));
     });
 
     socket.on('complete', (data) {

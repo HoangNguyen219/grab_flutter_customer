@@ -8,8 +8,8 @@ import 'package:grab_customer_app/controllers/ride_controller.dart';
 import 'package:grab_customer_app/utils/constants/app_constants.dart';
 import 'package:grab_customer_app/views/map/widget/custom_elevated_button.dart';
 
-class MapConfirmationBottomSheet extends StatelessWidget {
-  const MapConfirmationBottomSheet({super.key});
+class MapDriverBottomSheet extends StatelessWidget {
+  const MapDriverBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {

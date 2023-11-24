@@ -13,7 +13,7 @@ class Ride {
   final DateTime? endTime;
   final String? status;
   final double? distance;
-  final int? price;
+  final double? price;
 
   Ride({
     this.id,
@@ -65,7 +65,7 @@ class Ride {
       endTime: json[RideConstants.endTime] != null ? DateTime.parse(json[RideConstants.endTime]) : null,
       status: json[RideConstants.status],
       distance: json[RideConstants.distance]?.toDouble(),
-      price: json[RideConstants.price],
+      price: json[RideConstants.price]?.toDouble(),
     );
   }
 

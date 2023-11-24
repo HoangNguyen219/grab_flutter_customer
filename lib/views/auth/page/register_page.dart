@@ -15,14 +15,12 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController maxDistanceController = TextEditingController();
 
   final AuthController _authController = Get.find();
 
   @override
   void dispose() {
     nameController.dispose();
-    maxDistanceController.dispose();
     super.dispose();
   }
 
@@ -63,20 +61,17 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 grabRegisterPageBody(
                   nameController,
-                  maxDistanceController,
                 ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      if (nameController.text.isNotEmpty && maxDistanceController.text.isNotEmpty) {
+                      if (nameController.text.isNotEmpty) {
                         try {
-                          int maxDistance = int.parse(maxDistanceController.text.trim());
                           _authController.onBoardUser(
-                              nameController.text.trim(),
-                              maxDistance, context);
+                              nameController.text.trim(), context);
                         } catch (e) {
-                          Get.snackbar("error", "Max distance must be a number");
+                          Get.snackbar("error", e.toString());
                         }
                       } else {
                         Get.snackbar("error", "invalid values!");

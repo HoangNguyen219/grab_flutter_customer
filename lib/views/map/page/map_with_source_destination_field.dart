@@ -5,9 +5,11 @@ import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grab_customer_app/common/widget/loading_widget.dart';
 import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/views/home/page/home_page.dart';
 import 'package:grab_customer_app/views/map/widget/map_confirmation_bottom_sheet.dart';
+import 'package:grab_customer_app/views/map/widget/map_driver_bottom_sheet.dart';
 
 class MapWithSourceDestinationField extends StatefulWidget {
   final CameraPosition defaultCameraPosition;
@@ -59,7 +61,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                         polylines: {
                           Polyline(
                               polylineId: const PolylineId("polyLine"),
-                              color: Colors.black,
+                              color: Colors.green,
                               width: 6,
                               jointType: JointType.round,
                               startCap: Cap.roundCap,
@@ -68,7 +70,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                               points: _mapController.polylineCoordinates),
                           Polyline(
                               polylineId: const PolylineId("polyLineForAcptDriver"),
-                              color: Colors.black,
+                              color: Colors.blueAccent,
                               width: 6,
                               jointType: JointType.round,
                               startCap: Cap.roundCap,
@@ -85,8 +87,14 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                       ),
                     ),
                     Visibility(
-                      visible: _mapController.isReadyToDisplayAvlDriver.value,
-                      child: const SizedBox(height: 250, child: MapConfirmationBottomSheet()),
+                      visible: _mapController.bookingState.value != BookingState.isChoosingPlaces,
+                      child: SizedBox(
+                          height: 250,
+                          child: _mapController.bookingState.value == BookingState.isReadyToBook
+                              ? const MapConfirmationBottomSheet()
+                              : _mapController.bookingState.value == BookingState.isBooked
+                                  ? const LoadingWidget()
+                                  : const MapDriverBottomSheet()),
                     )
                   ],
                 ),
@@ -95,7 +103,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                 children: [
                   Obx(
                     () => Visibility(
-                      visible: !_mapController.isPolyLineDraw.value,
+                      visible: _mapController.bookingState.value == BookingState.isChoosingPlaces,
                       child: Container(
                         padding: const EdgeInsets.all(15),
                         color: Colors.grey[300],
@@ -107,9 +115,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                               decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                               child: GestureDetector(
                                 onTap: () {
-                                  // _mapController.subscription.cancel();
                                   Get.offAll(() => const HomePage());
-                                  // _mapController.subscription.cancel();
                                 },
                                 child: const FaIcon(
                                   FontAwesomeIcons.arrowLeft,
@@ -183,7 +189,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                                   },
                                   title: Text(_mapController.mapPredictionData[index].mainText.toString()),
                                   subtitle: Text(_mapController.mapPredictionData[index].secondaryText.toString()),
-                                  trailing: const Icon(Icons.check),
+                                  leading: const Icon(Icons.place),
                                 );
                               }),
                         ),
@@ -191,28 +197,6 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                     ),
                   ),
                 ],
-              ),
-              Visibility(
-                visible: _mapController.isDriverLoading.value,
-                child: Container(
-                  alignment: Alignment.bottomCenter,
-                  margin: const EdgeInsets.only(bottom: 15),
-                  child: const Positioned(
-                      //bottom: 15,
-                      child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    //crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(
-                        color: Colors.black,
-                      ),
-                      Text(
-                        "  Loading Rides....",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  )),
-                ),
               ),
             ],
           ),

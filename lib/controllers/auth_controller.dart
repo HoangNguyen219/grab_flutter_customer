@@ -62,7 +62,7 @@ class AuthController extends GetxController {
   }
 
   // On-board the user with additional details
-  Future<void> onBoardUser(String name, int maxDistance, BuildContext context) async {
+  Future<void> onBoardUser(String name, BuildContext context) async {
     try {
       final result = await _authService.onBoardUser(phone.value, name, CUSTOMER);
 

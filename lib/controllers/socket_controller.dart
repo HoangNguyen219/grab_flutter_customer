@@ -27,6 +27,11 @@ class SocketController extends GetxController {
       onOfflineDriver: (driverId) {
         onlineDrivers.removeWhere((onlineDriver) => onlineDriver.driverId == driverId);
       },
+      onAccept: (Driver driver) {
+        _mapController.bookingState.value = BookingState.isAccepted;
+        _mapController.acceptedDriver.value = driver;
+        _mapController.drawPathFromDriver();
+      }
     );
     final location = await LocationService.getLocation();
     if (location == null) {

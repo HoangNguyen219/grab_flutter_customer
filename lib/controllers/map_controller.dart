@@ -7,18 +7,28 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grab_customer_app/controllers/auth_controller.dart';
 import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/map_direction.dart';
 import 'package:grab_customer_app/models/map_direction_api_model.dart';
 import 'package:grab_customer_app/models/map_prediction.dart';
+import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/services/map_api_service.dart';
 import 'package:grab_customer_app/utils/constants/ride_constants.dart';
 
+enum BookingState {
+  isChoosingPlaces,
+  isReadyToBook,
+  isBooked,
+  isAccepted,
+}
+
 class MapController extends GetxController {
   final MapService _mapService;
+  final AuthController _authController = Get.find();
+  final Completer<GoogleMapController> controller = Completer();
 
   var mapPredictionData = <MapPrediction>[].obs;
-
   var mapDirectionData = <MapDirection>[].obs;
   var sourcePlaceName = "".obs;
   var destinationPlaceName = "".obs;
@@ -26,10 +36,9 @@ class MapController extends GetxController {
 
   RxDouble sourceLatitude = 0.0.obs;
   RxDouble sourceLongitude = 0.0.obs;
-
   RxDouble destinationLatitude = 0.0.obs;
   RxDouble destinationLongitude = 0.0.obs;
-  var availableDriversList = <Driver>[].obs;
+
 
   // polyline
   var polylineCoordinates = <LatLng>[].obs;
@@ -39,55 +48,50 @@ class MapController extends GetxController {
   //markers
   var markers = <Marker>[].obs;
 
-  var isPolyLineDraw = false.obs;
-  var isReadyToDisplayAvlDriver = false.obs;
+  var rideRequest = Ride().obs;
+  var availableDriversList = <Driver>[].obs;
 
-  var carRent = 0.obs;
-  var bikeRent = 0.obs;
-  var autoRent = 0.obs;
-  var isDriverLoading = false.obs;
-  var findDriverLoading = false.obs;
-  var prevTripId = "xyz".obs;
-
-  var reqAccepted = false.obs;
-
-  var reqAcceptedDriverAndVehicleData = <String, String>{};
-
-  final Completer<GoogleMapController> controller = Completer();
+  var bookingState = BookingState.isChoosingPlaces.obs;
+  var acceptedDriver = Driver().obs;
 
   MapController(this._mapService);
+
+  chooseOtherTrip() {
+    bookingState.value = BookingState.isChoosingPlaces;
+  }
 
   getPredictions(String placeName, String predictionType) async {
     mapPredictionData.clear();
     predictionListType.value = predictionType;
     if (placeName != sourcePlaceName.value || placeName != destinationPlaceName.value) {
-      // final predictionList = await _mapService.getGrabMapPrediction(placeName);
-      //
-      // List<MapPrediction> grabMapPredictionEntityList = [];
-      // for (int i = 0; i < predictionList.predictions!.length; i++) {
-      //   final predictionData = MapPrediction(
-      //       secondaryText: predictionList.predictions![i].structuredFormatting!.secondaryText,
-      //       mainText: predictionList.predictions![i].structuredFormatting!.mainText,
-      //       placeId: predictionList.predictions![i].placeId);
-      //   grabMapPredictionEntityList.add(predictionData);
-      //   mapPredictionData.value = grabMapPredictionEntityList;
-      mapPredictionData.value = [
-        MapPrediction(
-          secondaryText: 'Tân Bình, Thành phố Hồ Chí Minh, Vietnam',
-          mainText: '144 Âu Cơ, Phường 9',
-          placeId: 'abc123',
-        ),
-        MapPrediction(
-          secondaryText: 'Phường 14, Quận 10, Thành phố Hồ Chí Minh, Vietnam',
-          mainText: '268 Lý Thường Kiệt, Phường 14',
-          placeId: 'def456',
-        ),
-        MapPrediction(
-          secondaryText: 'Quận 1, Hồ Chí Minh',
-          mainText: 'Chợ Bến Thành - Cổng Đông',
-          placeId: 'ghi789',
-        ),
-      ];
+      final predictionList = await _mapService.getGrabMapPrediction(placeName);
+
+      List<MapPrediction> grabMapPredictionEntityList = [];
+      for (int i = 0; i < predictionList.predictions!.length; i++) {
+        final predictionData = MapPrediction(
+            secondaryText: predictionList.predictions![i].structuredFormatting!.secondaryText,
+            mainText: predictionList.predictions![i].structuredFormatting!.mainText,
+            placeId: predictionList.predictions![i].placeId);
+        grabMapPredictionEntityList.add(predictionData);
+        mapPredictionData.value = grabMapPredictionEntityList;
+      }
+      // mapPredictionData.value = [
+      //   MapPrediction(
+      //     secondaryText: 'Tân Bình, Thành phố Hồ Chí Minh, Vietnam',
+      //     mainText: '144 Âu Cơ, Phường 9',
+      //     placeId: 'abc123',
+      //   ),
+      //   MapPrediction(
+      //     secondaryText: 'Phường 14, Quận 10, Thành phố Hồ Chí Minh, Vietnam',
+      //     mainText: '268 Lý Thường Kiệt, Phường 14',
+      //     placeId: 'def456',
+      //   ),
+      //   MapPrediction(
+      //     secondaryText: 'Quận 1, Hồ Chí Minh',
+      //     mainText: 'Chợ Bến Thành - Cổng Đông',
+      //     placeId: 'ghi789',
+      //   ),
+      // ];
     }
   }
 
@@ -100,7 +104,7 @@ class MapController extends GetxController {
       destinationLatitude.value = destinationLocations[0].latitude;
       destinationLongitude.value = destinationLocations[0].longitude;
       addMarkers(destinationLocations[0].latitude, destinationLocations[0].longitude, "destination_marker",
-          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), "default", "Destination Location");
+          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "default", "Destination Location");
       animateCamera(destinationLocations[0].latitude, destinationLocations[0].longitude);
     }
     if (sourcePlace != "") {
@@ -110,7 +114,7 @@ class MapController extends GetxController {
       sourceLatitude.value = sourceLocations[0].latitude;
       sourceLongitude.value = sourceLocations[0].longitude;
       addMarkers(sourceLocations[0].latitude, sourceLocations[0].longitude, "source_marker",
-          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "default", "Source Location");
+          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), "default", "Source Location");
       animateCamera(sourceLocations[0].latitude, sourceLocations[0].longitude);
     }
     if (sourcePlaceName.value.isNotEmpty && destinationPlaceName.value.isNotEmpty) {
@@ -132,14 +136,13 @@ class MapController extends GetxController {
     );
 
     // Process direction data
-    List<MapDirection> grabMapDirectionEntityList = _processDirectionList(directionList);
-    mapDirectionData.value = grabMapDirectionEntityList;
-
-    // Get drivers within a certain distance
-    // updateAvailableDrivers();
+    List<MapDirection> mapDirectionList = _processDirectionList(directionList);
+    mapDirectionData.value = mapDirectionList;
 
     animateCameraPolyline();
     getPolyLine();
+    updateRideRequest();
+    bookingState.value = BookingState.isReadyToBook;
   }
 
   List<MapDirection> _processDirectionList(Direction directionList) {
@@ -156,9 +159,6 @@ class MapController extends GetxController {
   }
 
   void updateAvailableDrivers(List<Driver> onlineDrivers) {
-    print("=====================");
-    print(onlineDrivers);
-    isDriverLoading.value = true;
     List<Driver> driverData = onlineDrivers;
     availableDriversList.clear();
 
@@ -197,7 +197,6 @@ class MapController extends GetxController {
     for (var point in result) {
       polylineCoordinates.add(LatLng(point.latitude, point.longitude));
     }
-    isPolyLineDraw.value = true;
   }
 
   addMarkers(double latitude, double longitude, String markerId, icon, String type, String infoWindow) async {
@@ -243,106 +242,30 @@ class MapController extends GetxController {
     _controller.animateCamera(CameraUpdate.newCameraPosition(newPos));
   }
 
+  void updateRideRequest() {
+    rideRequest.value = Ride(
+        customerId: _authController.customerId.value,
+        startLocation: {RideConstants.lat: sourceLatitude.value, RideConstants.long: sourceLongitude.value},
+        endLocation: {RideConstants.lat: destinationLatitude.value, RideConstants.long: destinationLongitude.value},
+        startAddress: sourcePlaceName.value,
+        endAddress: destinationPlaceName.value,
+        distance: mapDirectionData[0].distanceValue! / 1000,
+        price: mapDirectionData[0].distanceValue! * RideConstants.priceFactor);
+  }
 
-// generateTrip(GrabDriverEntity driverData, int index) async {
-//   grabCancelTripUseCase.call(prevTripId.value, true); // if canceled
-//   subscription.pause();
-//   String vehicleType = driverData.vehicle!.path.split('/').first;
-//   String driverId = driverData.driverId.toString();
-//   String customerId = await grabAuthGetUserUidUseCase.call();
-//   DocumentReference driverIdRef = FirebaseFirestore.instance.doc("/drivers/${driverId.trim()}");
-//   DocumentReference customerIdRef = FirebaseFirestore.instance.doc("/customers/$customerId");
-//   var tripId = const Uuid().v4();
-//   prevTripId.value = tripId;
-//   final generateTripModel = GenerateTripModel(
-//       sourcePlaceName.value,
-//       destinationPlaceName.value,
-//       GeoPoint(sourceLatitude.value, sourceLongitude.value),
-//       GeoPoint(destinationLatitude.value, destinationLongitude.value),
-//       mapDirectionData[0].distanceValue! / 1000.roundToDouble(),
-//       mapDirectionData[0].durationText,
-//       false,
-//       DateTime.now().toString(),
-//       driverIdRef,
-//       customerIdRef,
-//       0.0,
-//       false,
-//       vehicleType == 'cars'
-//           ? carRent.value
-//           : vehicleType == 'auto'
-//               ? autoRent.value
-//               : bikeRent.value,
-//       false,
-//       false,
-//       tripId);
-//   Stream reqStatusData = grabMapGenerateTripUseCase.call(generateTripModel);
-//   findDriverLoading.value = true;
-//   late StreamSubscription tripSubscription;
-//   tripSubscription = reqStatusData.listen((data) async {
-//     final reqStatus = data.data()['ready_for_trip'];
-//     if (reqStatus) {
-//       subscription.cancel();
-//     }
-//     if (reqStatus && findDriverLoading.value) {
-//       subscription.cancel();
-//       final reqAcceptedDriverVehicleData =
-//           await grabMapGetVehicleDetailsUseCase.call(vehicleType, driverId); // get vehicldata if req accepted
-//       reqAcceptedDriverAndVehicleData["name"] = driverData.name.toString();
-//       reqAcceptedDriverAndVehicleData["mobile"] = driverData.mobile.toString();
-//       reqAcceptedDriverAndVehicleData["vehicle_color"] = reqAcceptedDriverVehicleData.color;
-//       reqAcceptedDriverAndVehicleData["vehicle_model"] = reqAcceptedDriverVehicleData.model;
-//       reqAcceptedDriverAndVehicleData["vehicle_company"] = reqAcceptedDriverVehicleData.company;
-//       reqAcceptedDriverAndVehicleData["vehicle_number_plate"] = reqAcceptedDriverVehicleData.numberPlate.toString();
-//       reqAcceptedDriverAndVehicleData["profile_img"] = driverData.profileImg.toString();
-//       reqAcceptedDriverAndVehicleData["overall_rating"] = driverData.overallRating.toString();
-//       if (markers.length > 2) {
-//         markers.removeRange(2, markers.length - 1);
-//       } // clear extra marker
-//       addMarkers(
-//           driverData.currentLocation!.latitude,
-//           driverData.currentLocation!.longitude,
-//           "acpt_driver_marker",
-//           driverData.vehicle!.path.split('/').first == "cars"
-//               ? 'assets/car.png'
-//               : driverData.vehicle!.path.split('/').first == "bikes"
-//                   ? 'assets/bike.png'
-//                   : 'assets/auto.png',
-//           "img",
-//           "Driver Location"); // add only acpt_driver_marker
-//
-//       // draw path from acpt_driver to consumer
-//       final directionData = await grabMapDirectionUsecase.call(driverData.currentLocation!.latitude,
-//           driverData.currentLocation!.longitude, sourceLatitude.value, sourceLongitude.value);
-//       List<PointLatLng> result = polylinePoints.decodePolyline(directionData[0].enCodedPoints.toString());
-//       polylineCoordinatesForAcceptDriver.clear();
-//       for (var point in result) {
-//         polylineCoordinatesForAcceptDriver.value.add(LatLng(point.latitude, point.longitude));
-//       }
-//       if (findDriverLoading.value && reqAccepted.value == false) {
-//         findDriverLoading.value = false;
-//         Get.snackbar(
-//           "Yahoo!",
-//           "request accepted by driver,driver will arrive within 10 min",
-//         );
-//         reqAccepted.value = true;
-//       }
-//     } else if (data.data()['is_arrived'] && !data.data()['is_completed']) {
-//       Get.snackbar("driver arrived!", "Now you can track from tripHistory page!",
-//           snackPosition: SnackPosition.BOTTOM);
-//       tripSubscription.cancel();
-//       Get.off(() => const TripHistory());
-//     }
-//     Timer(const Duration(seconds: 60), () {
-//       if (reqStatus == false && findDriverLoading.value) {
-//         tripSubscription.cancel();
-//         grabCancelTripUseCase.call(tripId, false);
-//         // availableDriversList.value.removeAt(index);
-//         Get.snackbar("Sorry !", "request denied by driver,please choose other driver",
-//             snackPosition: SnackPosition.BOTTOM);
-//         subscription.resume();
-//         findDriverLoading.value = false;
-//       }
-//     });
-//   });
-// }
+  void drawPathFromDriver() async {
+    final directionList = await _mapService.getGrabMapDirection(
+      acceptedDriver.value.location![RideConstants.lat],
+      acceptedDriver.value.location![RideConstants.long],
+      sourceLongitude.value,
+      sourceLatitude.value,
+    );
+    List<MapDirection> directionData = _processDirectionList(directionList);
+    List<PointLatLng> result = polylinePoints
+        .decodePolyline(directionData[0].enCodedPoints.toString());
+    polylineCoordinatesForAcceptDriver.clear();
+    for (var point in result) {
+      polylineCoordinatesForAcceptDriver.add(LatLng(point.latitude, point.longitude));
+    }
+  }
 }

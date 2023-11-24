@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
+import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/controllers/socket_controller.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/services/ride_api_service.dart';
@@ -16,6 +17,7 @@ class RideController extends GetxController {
   final RideService _rideService;
   final SocketController _socketController = Get.find();
   final AuthController _authController = Get.find();
+  final MapController _mapController = Get.find();
 
   final rideState = RideState.isReadyForNextRide.obs;
   final acceptedRide = Ride().obs;
@@ -34,12 +36,15 @@ class RideController extends GetxController {
             : RideState.isCompleted;
   }
 
-  Future<void> createBookingNow(Map<String, dynamic> rideData) async {
+  Future<void> createBookingNow(Ride ride) async {
     try {
-      final result = await _rideService.createBookingNow(rideData);
+      final result = await _rideService.createBookingNow(ride);
 
       if (result[STATUS] == true) {
-        // Handle successful ride creation
+        var ride = Ride.fromJson(result[DATA]);
+        _socketController.book(ride);
+        _mapController.rideRequest.value = ride;
+        _mapController.bookingState.value = BookingState.isBooked;
       } else {
         // Handle failed ride creation
       }

@@ -12,7 +12,7 @@
         android:label="Grab Customer">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyATocxf-P8CA_g3eDsN9OzsuYD0qAc97oU" />
+            android:value="AIzaSyCHUw4D6DSDOEgUN2X8b0jRhTSgukWHRsA" />
 
         <activity
             android:name=".MainActivity"

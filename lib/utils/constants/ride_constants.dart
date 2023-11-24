@@ -15,4 +15,5 @@ class RideConstants {
   static const String startTime = 'startTime';
   static const String endTime = 'endTime';
   static const String status = 'status';
+  static const double priceFactor = 12;
 }

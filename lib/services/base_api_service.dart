@@ -13,7 +13,7 @@ class BaseApiService {
     try {
       final http.Response response = await http.post(Uri.parse(url), headers: headers, body: jsonEncode(body));
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body) as Map<String, dynamic>;
       } else {
         throw Exception('Failed to perform POST request. Status code: ${response.statusCode}');
