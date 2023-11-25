@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/utils/constants/app_constants.dart';
+import 'package:grab_customer_app/views/map/page/map_live_tracking_page.dart';
 import 'package:intl/intl.dart';
 
 class RideHistoryTile extends StatefulWidget {
@@ -41,20 +42,22 @@ class _RideHistoryTileState extends State<RideHistoryTile> {
                               ? MaterialStateProperty.all(Colors.green)
                               : widget.ride.status == IN_PROGRESS
                                   ? MaterialStateProperty.all(Colors.orange)
-                                  : MaterialStateProperty.all(Colors.blue),
+                                  : widget.ride.status == CANCELLED
+                                      ? MaterialStateProperty.all(Colors.red)
+                                      : MaterialStateProperty.all(Colors.blue),
                         ),
                         child: widget.ride.status == COMPLETED
                             ? const Text(COMPLETED)
                             : widget.ride.status == IN_PROGRESS
                                 ? const Text('ONGOING')
-                                : const Text("WAITING"),
+                                : widget.ride.status == CANCELLED
+                                    ? const Text("CANCELLED")
+                                    : const Text("WAITING"),
                       ),
                       if (widget.ride.status == IN_PROGRESS)
                         GestureDetector(
                           onTap: () {
-                            // Get.to(() =>
-                            //     GrabMapLiveTrackingPage());
-                          },
+                            Get.to(() => MapLiveTrackingPage(ride: widget.ride));},
                           child: const Text(
                             "Track",
                             style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.w700),

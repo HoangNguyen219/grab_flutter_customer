@@ -21,7 +21,7 @@ enum BookingState {
   isReadyToBook,
   isBooked,
   isAccepted,
-  isArrived
+  isArrived,
 }
 
 class MapController extends GetxController {
@@ -50,7 +50,6 @@ class MapController extends GetxController {
   var markers = <Marker>[].obs;
 
   var rideRequest = Ride().obs;
-  var availableDriversList = <Driver>[].obs;
 
   var bookingState = BookingState.isChoosingPlaces.obs;
   var acceptedDriver = Driver().obs;
@@ -99,7 +98,6 @@ class MapController extends GetxController {
   setPlaceAndGetLocationDetailsAndDirection({required String sourcePlace, required String destinationPlace}) async {
     mapPredictionData.clear(); // clear list of suggestions
     if (destinationPlace != "") {
-      availableDriversList.clear();
       destinationPlaceName.value = destinationPlace;
       List<Location> destinationLocations = await locationFromAddress(destinationPlace); //get destination latlng
       destinationLatitude.value = destinationLocations[0].latitude;
@@ -109,7 +107,6 @@ class MapController extends GetxController {
       animateCamera(destinationLocations[0].latitude, destinationLocations[0].longitude);
     }
     if (sourcePlace != "") {
-      availableDriversList.clear();
       sourcePlaceName.value = sourcePlace;
       List<Location> sourceLocations = await locationFromAddress(sourcePlace); //get source latlng
       sourceLatitude.value = sourceLocations[0].latitude;
@@ -161,7 +158,6 @@ class MapController extends GetxController {
 
   void updateAvailableDrivers(List<Driver> onlineDrivers) {
     List<Driver> driverData = onlineDrivers;
-    availableDriversList.clear();
 
     // Remove extra markers
     if (markers.length > 2) {
@@ -179,7 +175,6 @@ class MapController extends GetxController {
       );
 
       if (distance < maxDistance) {
-        availableDriversList.add(driverData[i]);
         addMarkers(
           driverData[i].location![RideConstants.lat],
           driverData[i].location![RideConstants.long],

@@ -30,9 +30,7 @@ class SocketController extends GetxController {
       _mapController.drawPathFromDriver();
     }, onPick: () {
       _mapController.bookingState.value = BookingState.isArrived;
-      Get.snackbar(
-          "Driver arrived!", "Now you can track from tripHistory page!",
-          snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar("Driver arrived!", "Now you can track from history page!", snackPosition: SnackPosition.BOTTOM);
       Get.to(() => const RideHistoryPage());
     });
   }
@@ -55,5 +53,8 @@ class SocketController extends GetxController {
 
   void cancelRide(Ride ride) {
     _socketService.cancel(ride.driverId!, _authController.customerId.value);
+    _mapController.bookingState.value = BookingState.isChoosingPlaces;
+    Get.snackbar("Trip Canceled", "The trip has been canceled.", snackPosition: SnackPosition.BOTTOM);
+    Get.to(() => const RideHistoryPage());
   }
 }

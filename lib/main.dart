@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:grab_customer_app/common/internet/internet_controller.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
 import 'package:grab_customer_app/controllers/home_controller.dart';
+import 'package:grab_customer_app/controllers/live_tracking_controller.dart';
 import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/controllers/ride_controller.dart';
 import 'package:grab_customer_app/controllers/socket_controller.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
       home: Obx(() {
         Get.put(InternetController());
         Get.put(MapController(MapService(dotenv.env['MAP_URL'] ?? "https://maps.googleapis.com")));
+        Get.put(LiveTrackingController(MapService(dotenv.env['MAP_URL'] ?? "https://maps.googleapis.com")));
         Get.put(SocketController(SocketService(dotenv.env['SOCKET_URL'] ?? "ws://10.0.2.2:6666")));
         Get.put(HomeController());
         Get.put(RideController(RideService(dotenv.env['API_URL'] ?? "http://10.0.2.2:6666")));

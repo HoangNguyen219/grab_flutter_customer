@@ -39,7 +39,6 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
     return WillPopScope(
       onWillPop: () async {
         Get.offAll(() => const HomePage());
-        // _mapController.subscription.cancel();
         return true;
       },
       child: Scaffold(
