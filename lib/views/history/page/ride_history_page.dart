@@ -28,17 +28,20 @@ class _RideHistoryPageState extends State<RideHistoryPage> {
         backgroundColor: Colors.black,
         title: const Text("Your Rides"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Obx(() {
-          if (rideController.isLoading.value) {
-            return const LoadingWidget();
-          } else if (rideController.rideHistoryList.isEmpty) {
-            return const Center(child: Text("No Ride History Found."));
-          } else {
-            return _buildListWidget(rideController.rideHistoryList);
-          }
-        }),
+      body: RefreshIndicator(
+        onRefresh: rideController.getRides,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Obx(() {
+            if (rideController.isLoading.value) {
+              return const LoadingWidget();
+            } else if (rideController.rideHistoryList.isEmpty) {
+              return const Center(child: Text("No Ride History Found."));
+            } else {
+              return _buildListWidget(rideController.rideHistoryList);
+            }
+          }),
+        ),
       ),
     );
   }

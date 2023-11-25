@@ -29,32 +29,48 @@ class MapController extends GetxController {
   final AuthController _authController = Get.find();
   final Completer<GoogleMapController> controller = Completer();
 
-  var mapPredictionData = <MapPrediction>[].obs;
-  var mapDirectionData = <MapDirection>[].obs;
-  var sourcePlaceName = "".obs;
-  var destinationPlaceName = "".obs;
-  var predictionListType = "source".obs;
+  final mapPredictionData = <MapPrediction>[].obs;
+  final mapDirectionData = <MapDirection>[].obs;
+  final sourcePlaceName = "".obs;
+  final destinationPlaceName = "".obs;
+  final predictionListType = "source".obs;
 
-  RxDouble sourceLatitude = 0.0.obs;
-  RxDouble sourceLongitude = 0.0.obs;
-  RxDouble destinationLatitude = 0.0.obs;
-  RxDouble destinationLongitude = 0.0.obs;
-
+  final sourceLatitude = RxDouble(0.0);
+  final sourceLongitude = RxDouble(0.0);
+  final destinationLatitude = RxDouble(0.0);
+  final destinationLongitude = RxDouble(0.0);
 
   // polyline
-  var polylineCoordinates = <LatLng>[].obs;
-  var polylineCoordinatesForAcceptDriver = <LatLng>[].obs;
+  final polylineCoordinates = <LatLng>[].obs;
+  final polylineCoordinatesForAcceptDriver = <LatLng>[].obs;
   PolylinePoints polylinePoints = PolylinePoints();
 
   //markers
-  var markers = <Marker>[].obs;
+  final markers = <Marker>[].obs;
 
-  var rideRequest = Ride().obs;
+  final rideRequest = Ride().obs;
 
-  var bookingState = BookingState.isChoosingPlaces.obs;
-  var acceptedDriver = Driver().obs;
+  final bookingState = BookingState.isChoosingPlaces.obs;
+  final acceptedDriver = Driver().obs;
 
   MapController(this._mapService);
+
+  resetForNewTrip() {
+    bookingState.value = BookingState.isChoosingPlaces;
+    mapPredictionData.clear();
+    mapDirectionData.clear();
+    sourcePlaceName.value = "";
+    destinationPlaceName.value = "";
+    sourceLatitude.value = 0.0;
+    sourceLongitude.value = 0.0;
+    destinationLatitude.value = 0.0;
+    destinationLongitude.value = 0.0;
+    polylineCoordinates.clear();
+    polylineCoordinatesForAcceptDriver.clear();
+    markers.clear();
+    rideRequest.value = Ride();
+    acceptedDriver.value = Driver();
+  }
 
   chooseOtherTrip() {
     bookingState.value = BookingState.isChoosingPlaces;
@@ -75,23 +91,6 @@ class MapController extends GetxController {
         grabMapPredictionEntityList.add(predictionData);
         mapPredictionData.value = grabMapPredictionEntityList;
       }
-      // mapPredictionData.value = [
-      //   MapPrediction(
-      //     secondaryText: 'Tân Bình, Thành phố Hồ Chí Minh, Vietnam',
-      //     mainText: '144 Âu Cơ, Phường 9',
-      //     placeId: 'abc123',
-      //   ),
-      //   MapPrediction(
-      //     secondaryText: 'Phường 14, Quận 10, Thành phố Hồ Chí Minh, Vietnam',
-      //     mainText: '268 Lý Thường Kiệt, Phường 14',
-      //     placeId: 'def456',
-      //   ),
-      //   MapPrediction(
-      //     secondaryText: 'Quận 1, Hồ Chí Minh',
-      //     mainText: 'Chợ Bến Thành - Cổng Đông',
-      //     placeId: 'ghi789',
-      //   ),
-      // ];
     }
   }
 
@@ -253,12 +252,11 @@ class MapController extends GetxController {
     final directionList = await _mapService.getGrabMapDirection(
       acceptedDriver.value.location![RideConstants.lat],
       acceptedDriver.value.location![RideConstants.long],
-      sourceLongitude.value,
       sourceLatitude.value,
+      sourceLongitude.value,
     );
     List<MapDirection> directionData = _processDirectionList(directionList);
-    List<PointLatLng> result = polylinePoints
-        .decodePolyline(directionData[0].enCodedPoints.toString());
+    List<PointLatLng> result = polylinePoints.decodePolyline(directionData[0].enCodedPoints.toString());
     polylineCoordinatesForAcceptDriver.clear();
     for (var point in result) {
       polylineCoordinatesForAcceptDriver.add(LatLng(point.latitude, point.longitude));

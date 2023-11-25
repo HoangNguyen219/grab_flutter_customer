@@ -43,8 +43,8 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
                 children: [
                   GoogleMap(
                       mapType: MapType.normal,
-                      myLocationButtonEnabled: false,
-                      myLocationEnabled: false,
+                      myLocationButtonEnabled: true,
+                      myLocationEnabled: true,
                       initialCameraPosition: _defaultLocation,
                       markers: _liveTrackingController.markers.toSet(),
                       polylines: {
@@ -86,7 +86,7 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
                             children: [
                               Flexible(
                                 child: Text(
-                                  widget.ride.startLocation.toString(),
+                                  widget.ride.startAddress.toString(),
                                   style:
                                       const TextStyle(fontWeight: FontWeight.w700, fontSize: 25, color: Colors.white),
                                   overflow: TextOverflow.ellipsis,
@@ -95,7 +95,7 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
                               const FaIcon(FontAwesomeIcons.longArrowAltRight, color: Colors.white),
                               Flexible(
                                 child: Text(
-                                  widget.ride.endLocation.toString(),
+                                  widget.ride.endAddress.toString(),
                                   style:
                                       const TextStyle(fontWeight: FontWeight.w700, fontSize: 25, color: Colors.white),
                                   overflow: TextOverflow.ellipsis,

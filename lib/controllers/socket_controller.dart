@@ -19,20 +19,36 @@ class SocketController extends GetxController {
   }
 
   Future<void> initSocket() async {
-    _socketService.connect(onOnlineDriver: (Driver driver) {
-      onlineDrivers.add(driver);
-      _mapController.updateAvailableDrivers(onlineDrivers);
-    }, onOfflineDriver: (driverId) {
-      onlineDrivers.removeWhere((onlineDriver) => onlineDriver.driverId == driverId);
-    }, onAccept: (Driver driver) {
-      _mapController.bookingState.value = BookingState.isAccepted;
-      _mapController.acceptedDriver.value = driver;
-      _mapController.drawPathFromDriver();
-    }, onPick: () {
-      _mapController.bookingState.value = BookingState.isArrived;
-      Get.snackbar("Driver arrived!", "Now you can track from history page!", snackPosition: SnackPosition.BOTTOM);
-      Get.to(() => const RideHistoryPage());
-    });
+    _socketService.connect(onOnlineDriver: _onOnlineDriver
+        , onOfflineDriver: _onOfflineDriver,
+        onAccept: _onAccept, onPick: _onPick, onComplete: _onComplete);
+  }
+
+  void _onOnlineDriver(Driver driver) {
+    onlineDrivers.add(driver);
+    _mapController.updateAvailableDrivers(onlineDrivers);
+  }
+
+  void _onOfflineDriver(driverId) {
+    onlineDrivers.removeWhere((onlineDriver) => onlineDriver.driverId == driverId);
+  }
+
+  void _onAccept(Driver driver) {
+    _mapController.bookingState.value = BookingState.isAccepted;
+    _mapController.acceptedDriver.value = driver;
+    _mapController.drawPathFromDriver();
+  }
+
+  void _onPick() {
+    _mapController.bookingState.value = BookingState.isArrived;
+    Get.snackbar("Driver arrived!", "Now you can track from history page!", snackPosition: SnackPosition.BOTTOM);
+    Get.off(() => const RideHistoryPage());
+  }
+
+  void _onComplete() {
+    _mapController.resetForNewTrip();
+    Get.snackbar("Trip completed!", "Now you can book another trip!", snackPosition: SnackPosition.BOTTOM);
+    Get.off(() => const RideHistoryPage());
   }
 
   void closeSocket() {
@@ -53,8 +69,8 @@ class SocketController extends GetxController {
 
   void cancelRide(Ride ride) {
     _socketService.cancel(ride.driverId!, _authController.customerId.value);
-    _mapController.bookingState.value = BookingState.isChoosingPlaces;
+    _mapController.resetForNewTrip();
     Get.snackbar("Trip Canceled", "The trip has been canceled.", snackPosition: SnackPosition.BOTTOM);
-    Get.to(() => const RideHistoryPage());
+    Get.off(() => const RideHistoryPage());
   }
 }

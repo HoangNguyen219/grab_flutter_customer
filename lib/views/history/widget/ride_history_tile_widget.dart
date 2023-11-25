@@ -57,7 +57,7 @@ class _RideHistoryTileState extends State<RideHistoryTile> {
                       if (widget.ride.status == IN_PROGRESS)
                         GestureDetector(
                           onTap: () {
-                            Get.to(() => MapLiveTrackingPage(ride: widget.ride));},
+                            Get.off(() => MapLiveTrackingPage(ride: widget.ride));},
                           child: const Text(
                             "Track",
                             style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.w700),

@@ -9,11 +9,9 @@ class MapService extends BaseApiService {
   static String apiKey = dotenv.env['API_KEY'] ?? "";
 
   Future<PredictionsList> getGrabMapPrediction(String placeName) async {
-    print("==================");
     try {
       var response = await getRequest('maps/api/place/autocomplete/json',
           parameters: {'input': placeName, 'types': 'geocode', 'key': apiKey});
-      print(response);
       return PredictionsList.fromJson(response);
     } catch (error) {
       // Handle the error gracefully or throw it for upper layers to handle
@@ -26,14 +24,13 @@ class MapService extends BaseApiService {
       double sourceLat, double sourceLng, double destinationLat, double destinationLng) async {
     try {
       var response = await getRequest('maps/api/directions/json', parameters: {
-        'origin': "$sourceLat,$sourceLng",
+        'origin': "$sourceLat, $sourceLng",
         'destination': "$destinationLat, $destinationLng",
         'key': apiKey
       });
       print("=================");
       print(response);
       return Direction.fromJson(response);
-      // return Direction.fromJson(getDirectionDetailsFromAPIData);
     } catch (error) {
       // Handle the error gracefully or throw it for upper layers to handle
       print('Error in getGrabMapDirection: $error');

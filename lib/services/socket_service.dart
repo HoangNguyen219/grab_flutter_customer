@@ -13,7 +13,12 @@ class SocketService {
 
   SocketService(this.baseUrl);
 
-  void connect({Function(Driver driver)? onOnlineDriver, Function(int)? onOfflineDriver,  Function(Driver driver)? onAccept, Function()? onPick}) {
+  void connect(
+      {Function(Driver driver)? onOnlineDriver,
+      Function(int)? onOfflineDriver,
+      Function(Driver driver)? onAccept,
+      Function()? onPick,
+      Function()? onComplete}) {
     socket = io.io(baseUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -48,10 +53,8 @@ class SocketService {
     });
 
     socket.on('complete', (data) {
-      // Handle complete event
+      onComplete?.call();
     });
-
-
 
     socket.connect();
   }
@@ -69,9 +72,7 @@ class SocketService {
   }
 
   void cancel(int driverId, int customerId) {
-    _sendMessage(SocketConstants.cancel, {
-      RideConstants.driverId: driverId, RideConstants.customerId: customerId
-    });
+    _sendMessage(SocketConstants.cancel, {RideConstants.driverId: driverId, RideConstants.customerId: customerId});
   }
 
   void addCustomer(int customerId, Position location) {

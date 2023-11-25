@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/models/map_direction.dart';
 import 'package:grab_customer_app/models/map_direction_api_model.dart';
 import 'package:grab_customer_app/models/ride.dart';
@@ -32,7 +31,6 @@ class LiveTrackingController extends GetxController {
   LiveTrackingController(this._mapService);
 
   getDirectionData(Ride ride) async {
-    checkTripCompletionStatus(ride);
     final position = await LocationService.getLocation();
 
     if (position == null) {
@@ -56,6 +54,7 @@ class LiveTrackingController extends GetxController {
     addMarkers(BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "destination_marker",
         destinationLat.value, destinationLng.value, "Destination Location");
     addPolyLine();
+    isLoading.value = false;
   }
 
   List<MapDirection> _processDirectionList(Direction directionList) {
@@ -84,8 +83,6 @@ class LiveTrackingController extends GetxController {
     );
     _controller.animateCamera(CameraUpdate.newCameraPosition(liveLoc));
   }
-
-  checkTripCompletionStatus(Ride ride) {}
 
   addMarkers(icon, String markerId, double lat, double lng, String infoWindow) async {
     Marker marker = Marker(
