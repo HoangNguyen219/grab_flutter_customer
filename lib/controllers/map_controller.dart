@@ -14,6 +14,7 @@ import 'package:grab_customer_app/models/map_direction_api_model.dart';
 import 'package:grab_customer_app/models/map_prediction.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/services/map_api_service.dart';
+import 'package:grab_customer_app/utils/constants/app_constants.dart';
 import 'package:grab_customer_app/utils/constants/ride_constants.dart';
 
 enum BookingState {
@@ -27,13 +28,13 @@ enum BookingState {
 class MapController extends GetxController {
   final MapService _mapService;
   final AuthController _authController = Get.find();
-  final Completer<GoogleMapController> controller = Completer();
+  final Completer<GoogleMapController> googleMapController = Completer();
 
   final mapPredictionData = <MapPrediction>[].obs;
   final mapDirectionData = <MapDirection>[].obs;
-  final sourcePlaceName = "".obs;
-  final destinationPlaceName = "".obs;
-  final predictionListType = "source".obs;
+  final sourcePlaceName = EMPTY_STRING.obs;
+  final destinationPlaceName = EMPTY_STRING.obs;
+  final predictionListType = SOURCE.obs;
 
   final sourceLatitude = RxDouble(0.0);
   final sourceLongitude = RxDouble(0.0);
@@ -59,8 +60,8 @@ class MapController extends GetxController {
     bookingState.value = BookingState.isChoosingPlaces;
     mapPredictionData.clear();
     mapDirectionData.clear();
-    sourcePlaceName.value = "";
-    destinationPlaceName.value = "";
+    sourcePlaceName.value = EMPTY_STRING;
+    destinationPlaceName.value = EMPTY_STRING;
     sourceLatitude.value = 0.0;
     sourceLongitude.value = 0.0;
     destinationLatitude.value = 0.0;
@@ -82,37 +83,37 @@ class MapController extends GetxController {
     if (placeName != sourcePlaceName.value || placeName != destinationPlaceName.value) {
       final predictionList = await _mapService.getGrabMapPrediction(placeName);
 
-      List<MapPrediction> grabMapPredictionEntityList = [];
+      List<MapPrediction> grabMapPredictionList = [];
       for (int i = 0; i < predictionList.predictions!.length; i++) {
         final predictionData = MapPrediction(
             secondaryText: predictionList.predictions![i].structuredFormatting!.secondaryText,
             mainText: predictionList.predictions![i].structuredFormatting!.mainText,
             placeId: predictionList.predictions![i].placeId);
-        grabMapPredictionEntityList.add(predictionData);
-        mapPredictionData.value = grabMapPredictionEntityList;
+        grabMapPredictionList.add(predictionData);
       }
+      mapPredictionData.value = grabMapPredictionList;
     }
   }
 
   setPlaceAndGetLocationDetailsAndDirection({required String sourcePlace, required String destinationPlace}) async {
     mapPredictionData.clear(); // clear list of suggestions
-    if (destinationPlace != "") {
+    if (destinationPlace != EMPTY_STRING) {
       destinationPlaceName.value = destinationPlace;
-      List<Location> destinationLocations = await locationFromAddress(destinationPlace); //get destination latlng
+      List<Location> destinationLocations = await locationFromAddress(destinationPlace);
       destinationLatitude.value = destinationLocations[0].latitude;
       destinationLongitude.value = destinationLocations[0].longitude;
-      addMarkers(destinationLocations[0].latitude, destinationLocations[0].longitude, "destination_marker",
+      _addMarkers(destinationLatitude.value, destinationLongitude.value, "destination_marker",
           BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "default", "Destination Location");
-      animateCamera(destinationLocations[0].latitude, destinationLocations[0].longitude);
+      _animateCamera(destinationLatitude.value, destinationLongitude.value);
     }
-    if (sourcePlace != "") {
+    if (sourcePlace != EMPTY_STRING) {
       sourcePlaceName.value = sourcePlace;
-      List<Location> sourceLocations = await locationFromAddress(sourcePlace); //get source latlng
+      List<Location> sourceLocations = await locationFromAddress(sourcePlace);
       sourceLatitude.value = sourceLocations[0].latitude;
       sourceLongitude.value = sourceLocations[0].longitude;
-      addMarkers(sourceLocations[0].latitude, sourceLocations[0].longitude, "source_marker",
+      _addMarkers(sourceLatitude.value, sourceLongitude.value, "source_marker",
           BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen), "default", "Source Location");
-      animateCamera(sourceLocations[0].latitude, sourceLocations[0].longitude);
+      _animateCamera(sourceLatitude.value, sourceLongitude.value);
     }
     if (sourcePlaceName.value.isNotEmpty && destinationPlaceName.value.isNotEmpty) {
       if (sourcePlaceName.value != destinationPlaceName.value) {
@@ -136,9 +137,9 @@ class MapController extends GetxController {
     List<MapDirection> mapDirectionList = _processDirectionList(directionList);
     mapDirectionData.value = mapDirectionList;
 
-    animateCameraPolyline();
-    getPolyLine();
-    updateRideRequest();
+    _animateCameraPolyline();
+    _getPolyLine();
+    _updateRideRequest();
     bookingState.value = BookingState.isReadyToBook;
   }
 
@@ -174,7 +175,7 @@ class MapController extends GetxController {
       );
 
       if (distance < maxDistance) {
-        addMarkers(
+        _addMarkers(
           driverData[i].location![RideConstants.lat],
           driverData[i].location![RideConstants.long],
           i.toString(),
@@ -186,7 +187,7 @@ class MapController extends GetxController {
     }
   }
 
-  getPolyLine() async {
+  _getPolyLine() async {
     List<PointLatLng> result = polylinePoints.decodePolyline(mapDirectionData[0].enCodedPoints.toString());
     polylineCoordinates.clear();
     for (var point in result) {
@@ -194,7 +195,7 @@ class MapController extends GetxController {
     }
   }
 
-  addMarkers(double latitude, double longitude, String markerId, icon, String type, String infoWindow) async {
+  _addMarkers(double latitude, double longitude, String markerId, icon, String type, String infoWindow) async {
     Marker marker = Marker(
         icon: type == "img" ? BitmapDescriptor.fromBytes(await getBytesFromAsset(icon, 85)) : icon,
         markerId: MarkerId(markerId),
@@ -210,8 +211,8 @@ class MapController extends GetxController {
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
   }
 
-  void animateCameraPolyline() async {
-    final GoogleMapController _controller = await controller.future;
+  void _animateCameraPolyline() async {
+    final GoogleMapController controller = await googleMapController.future;
 
     LatLngBounds bounds = LatLngBounds(
       southwest: LatLng(
@@ -225,19 +226,19 @@ class MapController extends GetxController {
     );
 
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bounds, 50);
-    _controller.animateCamera(cameraUpdate);
+    controller.animateCamera(cameraUpdate);
   }
 
-  animateCamera(double lat, double lng) async {
-    final GoogleMapController _controller = await controller.future;
+  _animateCamera(double lat, double lng) async {
+    final GoogleMapController controller = await googleMapController.future;
     CameraPosition newPos = CameraPosition(
       target: LatLng(lat, lng),
       zoom: 11,
     );
-    _controller.animateCamera(CameraUpdate.newCameraPosition(newPos));
+    controller.animateCamera(CameraUpdate.newCameraPosition(newPos));
   }
 
-  void updateRideRequest() {
+  void _updateRideRequest() {
     rideRequest.value = Ride(
         customerId: _authController.customerId.value,
         startLocation: {RideConstants.lat: sourceLatitude.value, RideConstants.long: sourceLongitude.value},

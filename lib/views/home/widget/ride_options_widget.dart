@@ -21,7 +21,7 @@ rideOptionsWidget() {
             //   height: 5,
             // ),
             const Text(
-              "   Ride   ",
+              "4-seat",
               style: TextStyle(fontWeight: FontWeight.w600),
             )
           ],

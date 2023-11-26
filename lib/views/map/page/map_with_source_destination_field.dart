@@ -6,6 +6,7 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/controllers/map_controller.dart';
+import 'package:grab_customer_app/utils/constants/app_constants.dart';
 import 'package:grab_customer_app/views/home/page/home_page.dart';
 import 'package:grab_customer_app/views/map/widget/map_confirmation_bottom_sheet.dart';
 
@@ -66,7 +67,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                               geodesic: true,
                               points: _mapController.polylineCoordinates),
                           Polyline(
-                              polylineId: const PolylineId("polyLineForAcptDriver"),
+                              polylineId: const PolylineId("polyLineForAcceptDriver"),
                               color: Colors.blueAccent,
                               width: 6,
                               jointType: JointType.round,
@@ -78,7 +79,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                         zoomControlsEnabled: false,
                         zoomGesturesEnabled: true,
                         onMapCreated: (GoogleMapController controller) {
-                          _mapController.controller.complete(controller);
+                          _mapController.googleMapController.complete(controller);
                           controller.animateCamera(CameraUpdate.newCameraPosition(widget.newCameraPosition));
                         },
                       ),
@@ -106,7 +107,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                               decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                               child: GestureDetector(
                                 onTap: () {
-                                  Get.offAll(() => const HomePage());
+                                  Get.off(() => const HomePage());
                                 },
                                 child: const FaIcon(
                                   FontAwesomeIcons.arrowLeft,
@@ -123,7 +124,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                                   color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(12))),
                               child: TextField(
                                 onChanged: (val) {
-                                  _mapController.getPredictions(val, 'source');
+                                  _mapController.getPredictions(val, SOURCE);
                                 },
                                 decoration:
                                     const InputDecoration(border: InputBorder.none, hintText: "Enter Source Place"),
@@ -140,7 +141,7 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                                   color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(12))),
                               child: TextField(
                                 onChanged: (val) {
-                                  _mapController.getPredictions(val, 'destination');
+                                  _mapController.getPredictions(val, DESTINATION);
                                 },
                                 decoration: const InputDecoration(
                                   hintText: "Enter Destination Place",
@@ -167,13 +168,13 @@ class MapWithSourceDestinationFieldState extends State<MapWithSourceDestinationF
                                 return ListTile(
                                   onTap: () async {
                                     FocusScope.of(context).unfocus();
-                                    if (_mapController.predictionListType.value == 'source') {
+                                    if (_mapController.predictionListType.value == SOURCE) {
                                       _mapController.setPlaceAndGetLocationDetailsAndDirection(
                                           sourcePlace: _mapController.mapPredictionData[index].mainText.toString(),
-                                          destinationPlace: "");
+                                          destinationPlace: EMPTY_STRING);
                                     } else {
                                       _mapController.setPlaceAndGetLocationDetailsAndDirection(
-                                          sourcePlace: "",
+                                          sourcePlace: EMPTY_STRING,
                                           destinationPlace:
                                               _mapController.mapPredictionData[index].mainText.toString());
                                     }

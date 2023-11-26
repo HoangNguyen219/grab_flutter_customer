@@ -9,3 +9,5 @@ const String IN_PROGRESS = 'IN_PROGRESS';
 const String COMPLETED = 'COMPLETED';
 const String CANCELLED = 'CANCELLED';
 const String VND_SIGN = '\u{20AB}';
+const String SOURCE = 'source';
+const String DESTINATION = 'destination';

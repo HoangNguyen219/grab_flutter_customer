@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:grab_customer_app/common/widget/loading_widget.dart';
+import 'package:grab_customer_app/controllers/auth_controller.dart';
 import 'package:grab_customer_app/controllers/ride_controller.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/views/history/widget/ride_history_tile_widget.dart';
@@ -14,6 +15,7 @@ class RideHistoryPage extends StatefulWidget {
 
 class _RideHistoryPageState extends State<RideHistoryPage> {
   final RideController rideController = Get.find();
+  final AuthController authController = Get.find();
 
   @override
   void initState() {
@@ -24,10 +26,14 @@ class _RideHistoryPageState extends State<RideHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text("Your Rides"),
-      ),
+      appBar: AppBar(backgroundColor: Colors.black, title: const Text("Your Rides"), actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.logout),
+          onPressed: () {
+            authController.logOut();
+          },
+        ),
+      ]),
       body: RefreshIndicator(
         onRefresh: rideController.getRides,
         child: Padding(

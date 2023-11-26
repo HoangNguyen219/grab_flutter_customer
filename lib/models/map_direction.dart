@@ -3,7 +3,7 @@ class MapDirection {
   final int? durationValue;
   final String? distanceText;
   final String? durationText;
-  final String? enCodedPoints; //for polyline
+  final String? enCodedPoints;
 
   MapDirection({
     required this.distanceValue,

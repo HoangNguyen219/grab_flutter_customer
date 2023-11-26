@@ -28,8 +28,6 @@ class MapService extends BaseApiService {
         'destination': "$destinationLat, $destinationLng",
         'key': apiKey
       });
-      print("=================");
-      print(response);
       return Direction.fromJson(response);
     } catch (error) {
       // Handle the error gracefully or throw it for upper layers to handle
