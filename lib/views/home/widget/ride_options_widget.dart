@@ -21,7 +21,7 @@ rideOptionsWidget() {
             //   height: 5,
             // ),
             const Text(
-              "4-seat",
+              "4-seater",
               style: TextStyle(fontWeight: FontWeight.w600),
             )
           ],
@@ -44,7 +44,7 @@ rideOptionsWidget() {
             //   height: 5,
             // ),
             const Text(
-              "Rentals",
+              "7-seater",
               style: TextStyle(fontWeight: FontWeight.w600),
             )
           ],
@@ -67,7 +67,7 @@ rideOptionsWidget() {
             //   height: 5,
             // ),
             const Text(
-              "Intercity",
+              "VIP",
               style: TextStyle(fontWeight: FontWeight.w600),
             )
           ],

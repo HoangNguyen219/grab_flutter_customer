@@ -112,7 +112,7 @@ class HomePageState extends State<HomePage> {
 
   void _openMapWithCameraPosition(double lat, double lng) {
     final newCameraPos = CameraPosition(target: LatLng(lat, lng), zoom: 14.4746);
-    Get.to(() => MapWithSourceDestinationField(newCameraPosition: newCameraPos, defaultCameraPosition: _defaultLocation));
+    Get.to(() => MapWithSourceDestinationField(newCameraPosition: newCameraPos, defaultCameraPosition: newCameraPos));
   }
 
   void _handleMapTap(LatLng latLng) {

@@ -19,9 +19,13 @@ class SocketController extends GetxController {
   }
 
   Future<void> initSocket() async {
-    _socketService.connect(onOnlineDriver: _onOnlineDriver
-        , onOfflineDriver: _onOfflineDriver,
-        onAccept: _onAccept, onPick: _onPick, onComplete: _onComplete);
+    _socketService.connect(
+        onOnlineDriver: _onOnlineDriver,
+        onOfflineDriver: _onOfflineDriver,
+        onAccept: _onAccept,
+        onPick: _onPick,
+        onComplete: _onComplete,
+        onChangeLocationDriver: _onChangeLocationDriver);
   }
 
   void _onOnlineDriver(Driver driver) {
@@ -31,6 +35,7 @@ class SocketController extends GetxController {
 
   void _onOfflineDriver(driverId) {
     onlineDrivers.removeWhere((onlineDriver) => onlineDriver.driverId == driverId);
+    _mapController.updateAvailableDrivers(onlineDrivers);
   }
 
   void _onAccept(Driver driver) {
@@ -49,6 +54,11 @@ class SocketController extends GetxController {
     _mapController.resetForNewTrip();
     Get.snackbar("Trip completed!", "Now you can book another trip!", snackPosition: SnackPosition.BOTTOM);
     Get.off(() => const RideHistoryPage());
+  }
+
+  void _onChangeLocationDriver(Driver driver) {
+    _mapController.acceptedDriver.value = driver;
+    _mapController.drawPathFromDriver();
   }
 
   void closeSocket() {

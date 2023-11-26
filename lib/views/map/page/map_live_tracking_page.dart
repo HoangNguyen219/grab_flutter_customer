@@ -21,7 +21,7 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
   final LiveTrackingController _liveTrackingController = Get.find();
 
   static const CameraPosition _defaultLocation = CameraPosition(
-    target: LatLng(23.030357, 72.517845),
+    target: LatLng(10.77687, 106.70291),
     zoom: 14.4746,
   );
 

@@ -53,6 +53,7 @@ class MapController extends GetxController {
 
   final bookingState = BookingState.isChoosingPlaces.obs;
   final acceptedDriver = Driver().obs;
+  final onlineDrivers = <Driver>[].obs;
 
   MapController(this._mapService);
 
@@ -140,6 +141,7 @@ class MapController extends GetxController {
     _animateCameraPolyline();
     _getPolyLine();
     _updateRideRequest();
+    updateAvailableDrivers(onlineDrivers);
     bookingState.value = BookingState.isReadyToBook;
   }
 
@@ -156,8 +158,8 @@ class MapController extends GetxController {
     }).toList();
   }
 
-  void updateAvailableDrivers(List<Driver> onlineDrivers) {
-    List<Driver> driverData = onlineDrivers;
+  void updateAvailableDrivers(List<Driver> onlineDriversList) {
+    onlineDrivers.value = onlineDriversList;
 
     // Remove extra markers
     if (markers.length > 2) {
@@ -166,18 +168,18 @@ class MapController extends GetxController {
 
     // Filter and add nearby drivers
     const double maxDistance = 5000; // Maximum distance in meters
-    for (int i = 0; i < driverData.length; i++) {
+    for (int i = 0; i < onlineDrivers.length; i++) {
       double distance = Geolocator.distanceBetween(
         sourceLatitude.value,
         sourceLongitude.value,
-        driverData[i].location![RideConstants.lat],
-        driverData[i].location![RideConstants.long],
+        onlineDrivers[i].location![RideConstants.lat],
+        onlineDrivers[i].location![RideConstants.long],
       );
 
       if (distance < maxDistance) {
         _addMarkers(
-          driverData[i].location![RideConstants.lat],
-          driverData[i].location![RideConstants.long],
+          onlineDrivers[i].location![RideConstants.lat],
+          onlineDrivers[i].location![RideConstants.long],
           i.toString(),
           'assets/car.png',
           "img",
@@ -230,12 +232,18 @@ class MapController extends GetxController {
   }
 
   _animateCamera(double lat, double lng) async {
-    final GoogleMapController controller = await googleMapController.future;
-    CameraPosition newPos = CameraPosition(
-      target: LatLng(lat, lng),
-      zoom: 11,
-    );
-    controller.animateCamera(CameraUpdate.newCameraPosition(newPos));
+    try {
+      final GoogleMapController controller = await googleMapController.future;
+      CameraPosition newPos = CameraPosition(
+        target: LatLng(lat, lng),
+        zoom: 11,
+      );
+      controller.animateCamera(CameraUpdate.newCameraPosition(newPos));
+    }
+    catch (e) {
+      print("=======================");
+      print(e);
+    }
   }
 
   void _updateRideRequest() {

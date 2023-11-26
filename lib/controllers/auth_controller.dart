@@ -19,7 +19,6 @@ class AuthController extends GetxController {
 
   final RxInt customerId = 0.obs;
   final RxString phone = EMPTY_STRING.obs;
-  var profileImgUrl = "https://i.pinimg.com/originals/51/f6/fb/51f6fb256629fc755b8870c801092942.png".obs;
 
   @override
   void onInit() {

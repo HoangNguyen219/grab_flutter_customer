@@ -18,7 +18,8 @@ class SocketService {
       Function(int)? onOfflineDriver,
       Function(Driver driver)? onAccept,
       Function()? onPick,
-      Function()? onComplete}) {
+      Function()? onComplete,
+      Function(Driver driver)? onChangeLocationDriver}) {
     socket = io.io(baseUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -32,28 +33,33 @@ class SocketService {
       print('Socket disconnected');
     });
 
-    socket.on('online-driver', (data) {
+    socket.on(SocketConstants.onlineDriver, (data) {
       var dataDecode = json.decode(data);
       onOnlineDriver?.call(Driver.fromJson(dataDecode));
     });
 
-    socket.on('offline-driver', (data) {
+    socket.on(SocketConstants.offlineDriver, (data) {
       var dataDecode = json.decode(data);
       int driverId = dataDecode[RideConstants.driverId];
       onOfflineDriver?.call(driverId);
     });
 
-    socket.on('accept', (data) {
+    socket.on(SocketConstants.accept, (data) {
       var dataDecode = json.decode(data);
       onAccept?.call(Driver.fromJson(dataDecode));
     });
 
-    socket.on('pick', (data) {
+    socket.on(SocketConstants.pick, (data) {
       onPick?.call();
     });
 
-    socket.on('complete', (data) {
+    socket.on(SocketConstants.complete, (data) {
       onComplete?.call();
+    });
+
+    socket.on(SocketConstants.changeLocationDriver, (data) {
+      var dataDecode = json.decode(data);
+      onChangeLocationDriver?.call(Driver.fromJson(dataDecode));
     });
 
     socket.connect();

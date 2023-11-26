@@ -87,15 +87,28 @@ class MapConfirmationBottomSheet extends StatelessWidget {
                 ],
               ),
             if (mapController.bookingState.value == BookingState.isAccepted)
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    "Driver is coming...",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    "Driver ID: ${mapController.acceptedDriver.value.driverId.toString()}",
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage(
+                      'assets/avatar.png',
+                    ),
+                  ),
+                  const Text(
+                    "Coming...",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  )
                 ],
               ),
+            const SizedBox(
+              height: 10,
+            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
