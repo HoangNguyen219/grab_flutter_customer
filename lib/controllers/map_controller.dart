@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
+import 'package:grab_customer_app/controllers/home_controller.dart';
 import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/map_direction.dart';
 import 'package:grab_customer_app/models/map_direction_api_model.dart';
@@ -28,6 +29,7 @@ enum BookingState {
 class MapController extends GetxController {
   final MapService _mapService;
   final AuthController _authController = Get.find();
+
   final Completer<GoogleMapController> googleMapController = Completer();
 
   final mapPredictionData = <MapPrediction>[].obs;
@@ -141,7 +143,8 @@ class MapController extends GetxController {
     _animateCameraPolyline();
     _getPolyLine();
     _updateRideRequest();
-    updateAvailableDrivers(onlineDrivers);
+    _addDriverMarkers();
+
     bookingState.value = BookingState.isReadyToBook;
   }
 
@@ -160,7 +163,10 @@ class MapController extends GetxController {
 
   void updateAvailableDrivers(List<Driver> onlineDriversList) {
     onlineDrivers.value = onlineDriversList;
+    _addDriverMarkers();
+  }
 
+  void _addDriverMarkers() {
     // Remove extra markers
     if (markers.length > 2) {
       markers.removeRange(2, markers.length - 1);
@@ -189,6 +195,24 @@ class MapController extends GetxController {
     }
   }
 
+  void _addAcceptedDriverMarker() {
+    // Remove extra markers
+    print("==================");
+    print(markers.length);
+    if (markers.length > 2) {
+      markers.removeRange(2, markers.length);
+    }
+
+    _addMarkers(
+      acceptedDriver.value.location![RideConstants.lat],
+      acceptedDriver.value.location![RideConstants.long],
+      'AcceptedDriverMarker',
+      'assets/car.png',
+      "img",
+      "Driver Location",
+    );
+  }
+
   _getPolyLine() async {
     List<PointLatLng> result = polylinePoints.decodePolyline(mapDirectionData[0].enCodedPoints.toString());
     polylineCoordinates.clear();
@@ -199,14 +223,14 @@ class MapController extends GetxController {
 
   _addMarkers(double latitude, double longitude, String markerId, icon, String type, String infoWindow) async {
     Marker marker = Marker(
-        icon: type == "img" ? BitmapDescriptor.fromBytes(await getBytesFromAsset(icon, 85)) : icon,
+        icon: type == "img" ? BitmapDescriptor.fromBytes(await _getBytesFromAsset(icon, 85)) : icon,
         markerId: MarkerId(markerId),
         infoWindow: InfoWindow(title: infoWindow),
         position: LatLng(latitude, longitude));
     markers.add(marker);
   }
 
-  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
     ui.FrameInfo fi = await codec.getNextFrame();
@@ -239,9 +263,7 @@ class MapController extends GetxController {
         zoom: 11,
       );
       controller.animateCamera(CameraUpdate.newCameraPosition(newPos));
-    }
-    catch (e) {
-      print("=======================");
+    } catch (e) {
       print(e);
     }
   }
@@ -257,7 +279,13 @@ class MapController extends GetxController {
         price: mapDirectionData[0].distanceValue! * RideConstants.priceFactor);
   }
 
-  void drawPathFromDriver() async {
+  void updateAcceptedDriver(Driver driver) {
+    acceptedDriver.value = driver;
+    _addAcceptedDriverMarker();
+    _drawPathFromDriver();
+  }
+
+  void _drawPathFromDriver() async {
     final directionList = await _mapService.getGrabMapDirection(
       acceptedDriver.value.location![RideConstants.lat],
       acceptedDriver.value.location![RideConstants.long],

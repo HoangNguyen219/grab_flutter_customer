@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/utils/constants/ride_constants.dart';
@@ -19,7 +18,8 @@ class SocketService {
       Function(Driver driver)? onAccept,
       Function()? onPick,
       Function()? onComplete,
-      Function(Driver driver)? onChangeLocationDriver}) {
+      Function(Driver driver)? onChangeLocationDriver,
+      Function()? onConnect}) {
     socket = io.io(baseUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
@@ -27,6 +27,7 @@ class SocketService {
 
     socket.onConnect((_) {
       print('Socket connected');
+      onConnect?.call();
     });
 
     socket.onDisconnect((_) {
@@ -81,10 +82,9 @@ class SocketService {
     _sendMessage(SocketConstants.cancel, {RideConstants.driverId: driverId, RideConstants.customerId: customerId});
   }
 
-  void addCustomer(int customerId, Position location) {
+  void addCustomer(int customerId) {
     _sendMessage(SocketConstants.addCustomer, {
       RideConstants.customerId: customerId,
-      RideConstants.location: {RideConstants.lat: location.latitude, RideConstants.long: location.longitude}
     });
   }
 

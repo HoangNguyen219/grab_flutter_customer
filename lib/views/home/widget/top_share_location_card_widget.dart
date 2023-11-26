@@ -33,7 +33,7 @@ topShareLocationCardWidget(HomeController homeController) {
             ),
             GestureDetector(
               onTap: () {
-                homeController.getCurrentLocation();
+                homeController.animateCurrentLocation();
               },
               child: const Row(
                 children: [

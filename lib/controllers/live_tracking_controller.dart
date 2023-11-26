@@ -26,9 +26,11 @@ class LiveTrackingController extends GetxController {
   var polylineCoordinates = <LatLng>[].obs;
   PolylinePoints polylinePoints = PolylinePoints();
 
-  final Completer<GoogleMapController> controller = Completer();
+  final Completer<GoogleMapController> googleMapController = Completer();
 
   LiveTrackingController(this._mapService);
+
+
 
   getDirectionData(Ride ride) async {
     final position = await LocationService.getLocation();
@@ -49,11 +51,11 @@ class LiveTrackingController extends GetxController {
     List<MapDirection> mapDirectionList = _processDirectionList(directionList);
     mapDirectionData.value = mapDirectionList;
 
-    addMarkers(BitmapDescriptor.fromBytes(await getBytesFromAsset('assets/car.png', 85)), "live_marker",
+    _addMarkers(BitmapDescriptor.fromBytes(await _getBytesFromAsset('assets/car.png', 85)), "live_marker",
         liveLocLatitude.value, liveLocLongitude.value, "Your Location");
-    addMarkers(BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "destination_marker",
+    _addMarkers(BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "destination_marker",
         destinationLat.value, destinationLng.value, "Destination Location");
-    addPolyLine();
+    _addPolyLine();
     isLoading.value = false;
   }
 
@@ -70,21 +72,21 @@ class LiveTrackingController extends GetxController {
     }).toList();
   }
 
-  addPolyLine() async {
+  _addPolyLine() async {
     List<PointLatLng> result = polylinePoints.decodePolyline(mapDirectionData[0].enCodedPoints.toString());
     polylineCoordinates.clear();
     for (var point in result) {
       polylineCoordinates.add(LatLng(point.latitude, point.longitude));
     }
-    final GoogleMapController _controller = await controller.future;
+    final GoogleMapController controller = await googleMapController.future;
     CameraPosition liveLoc = CameraPosition(
       target: LatLng(liveLocLatitude.value, liveLocLongitude.value),
       zoom: 16,
     );
-    _controller.animateCamera(CameraUpdate.newCameraPosition(liveLoc));
+    controller.animateCamera(CameraUpdate.newCameraPosition(liveLoc));
   }
 
-  addMarkers(icon, String markerId, double lat, double lng, String infoWindow) async {
+  _addMarkers(icon, String markerId, double lat, double lng, String infoWindow) async {
     Marker marker = Marker(
         icon: icon,
         markerId: MarkerId(markerId),
@@ -93,7 +95,7 @@ class LiveTrackingController extends GetxController {
     markers.add(marker);
   }
 
-  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
     ui.FrameInfo fi = await codec.getNextFrame();

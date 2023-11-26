@@ -1,4 +1,3 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
 import 'package:grab_customer_app/controllers/map_controller.dart';
@@ -20,12 +19,16 @@ class SocketController extends GetxController {
 
   Future<void> initSocket() async {
     _socketService.connect(
-        onOnlineDriver: _onOnlineDriver,
-        onOfflineDriver: _onOfflineDriver,
-        onAccept: _onAccept,
-        onPick: _onPick,
-        onComplete: _onComplete,
-        onChangeLocationDriver: _onChangeLocationDriver);
+      onOnlineDriver: _onOnlineDriver,
+      onOfflineDriver: _onOfflineDriver,
+      onAccept: _onAccept,
+      onPick: _onPick,
+      onComplete: _onComplete,
+      onChangeLocationDriver: _onChangeLocationDriver,
+      onConnect: () {
+        addCustomer();
+      },
+    );
   }
 
   void _onOnlineDriver(Driver driver) {
@@ -40,8 +43,7 @@ class SocketController extends GetxController {
 
   void _onAccept(Driver driver) {
     _mapController.bookingState.value = BookingState.isAccepted;
-    _mapController.acceptedDriver.value = driver;
-    _mapController.drawPathFromDriver();
+    _mapController.updateAcceptedDriver(driver);
   }
 
   void _onPick() {
@@ -57,8 +59,7 @@ class SocketController extends GetxController {
   }
 
   void _onChangeLocationDriver(Driver driver) {
-    _mapController.acceptedDriver.value = driver;
-    _mapController.drawPathFromDriver();
+    _mapController.updateAcceptedDriver(driver);
   }
 
   void closeSocket() {
@@ -69,12 +70,12 @@ class SocketController extends GetxController {
     _socketService.book(ride);
   }
 
-  void removeCustomer(int customerId) {
-    _socketService.removeCustomer(customerId);
+  void removeCustomer() {
+    _socketService.removeCustomer(_authController.customerId.value);
   }
 
-  void addCustomer(int customerId, Position location) {
-    _socketService.addCustomer(customerId, location);
+  void addCustomer() {
+    _socketService.addCustomer(_authController.customerId.value);
   }
 
   void cancelRide(Ride ride) {

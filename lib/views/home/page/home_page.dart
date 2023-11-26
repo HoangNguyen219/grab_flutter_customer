@@ -27,7 +27,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _homeController.getCurrentLocation();
+    _homeController.animateCurrentLocation();
   }
 
   @override

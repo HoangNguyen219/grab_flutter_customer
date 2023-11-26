@@ -44,7 +44,7 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
                   GoogleMap(
                       mapType: MapType.normal,
                       myLocationButtonEnabled: true,
-                      myLocationEnabled: true,
+                      myLocationEnabled: false,
                       initialCameraPosition: _defaultLocation,
                       markers: _liveTrackingController.markers.toSet(),
                       polylines: {
@@ -61,7 +61,7 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
                       zoomControlsEnabled: false,
                       zoomGesturesEnabled: true,
                       onMapCreated: (GoogleMapController controller) {
-                        _liveTrackingController.controller.complete(controller);
+                        _liveTrackingController.googleMapController.complete(controller);
                         CameraPosition liveLoc = CameraPosition(
                           target: LatLng(_liveTrackingController.liveLocLatitude.value,
                               _liveTrackingController.liveLocLongitude.value),
