@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/map_direction.dart';
 import 'package:grab_customer_app/models/map_direction_api_model.dart';
 import 'package:grab_customer_app/models/ride.dart';
@@ -30,9 +30,9 @@ class LiveTrackingController extends GetxController {
 
   LiveTrackingController(this._mapService);
 
-  getDirectionData(Ride ride, Position position) async {
-    liveLocLatitude.value = position.latitude;
-    liveLocLongitude.value = position.longitude;
+  getDirectionData(Ride ride, Driver driver) async {
+    liveLocLatitude.value = driver.location![RideConstants.lat];
+    liveLocLongitude.value = driver.location![RideConstants.long];
     destinationLat.value = ride.endLocation![RideConstants.lat];
     destinationLng.value = ride.endLocation![RideConstants.long];
 
@@ -43,10 +43,14 @@ class LiveTrackingController extends GetxController {
     List<MapDirection> mapDirectionList = _processDirectionList(directionList);
     mapDirectionData.value = mapDirectionList;
 
-    _addMarkers(BitmapDescriptor.fromBytes(await _getBytesFromAsset('assets/car.png', 85)), "live_marker",
-        liveLocLatitude.value, liveLocLongitude.value, "Your Location");
+    markers.clear();
+
     _addMarkers(BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed), "destination_marker",
         destinationLat.value, destinationLng.value, "Destination Location");
+
+    _addMarkers(BitmapDescriptor.fromBytes(await _getBytesFromAsset('assets/car.png', 85)), "live_marker",
+        liveLocLatitude.value, liveLocLongitude.value, "Your Location");
+
     _addPolyLine();
     isLoading.value = false;
   }

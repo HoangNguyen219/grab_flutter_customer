@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
+import 'package:grab_customer_app/controllers/live_tracking_controller.dart';
 import 'package:grab_customer_app/controllers/map_controller.dart';
 import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/ride.dart';
@@ -10,6 +11,7 @@ class SocketController extends GetxController {
   final SocketService _socketService;
   final AuthController _authController = Get.find();
   final MapController _mapController = Get.find();
+  final LiveTrackingController _liveTrackingController = Get.find();
 
   RxList<Driver> onlineDrivers = <Driver>[].obs;
 
@@ -60,8 +62,12 @@ class SocketController extends GetxController {
   }
 
   void _onChangeLocationDriver(Driver driver) {
-    print("_onChangeLocationDriver");
-    _mapController.updateAcceptedDriver(driver);
+    if (_mapController.bookingState.value == BookingState.isAccepted) {
+      _mapController.updateAcceptedDriver(driver);
+    }
+    if (_mapController.bookingState.value == BookingState.isArrived) {
+      _liveTrackingController.getDirectionData(_mapController.rideRequest.value, driver);
+    }
   }
 
   void closeSocket() {

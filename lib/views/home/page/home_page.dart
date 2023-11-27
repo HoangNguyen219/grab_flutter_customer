@@ -45,12 +45,14 @@ class HomePageState extends State<HomePage> {
               topShareLocationCardWidget(_homeController),
               const SizedBox(height: 15),
               GestureDetector(
-                onTap: () => _openMapWithCameraPosition(_homeController.currentLat.value, _homeController.currentLng.value),
+                onTap: () =>
+                    _openMapWithCameraPosition(_homeController.currentLat.value, _homeController.currentLng.value),
                 child: rideOptionsWidget(),
               ),
               const SizedBox(height: 15),
               GestureDetector(
-                onTap: () => _openMapWithCameraPosition(_homeController.currentLat.value, _homeController.currentLng.value),
+                onTap: () =>
+                    _openMapWithCameraPosition(_homeController.currentLat.value, _homeController.currentLng.value),
                 child: whereToWidget(),
               ),
               ListTile(
@@ -97,7 +99,8 @@ class HomePageState extends State<HomePage> {
                         myLocationEnabled: true,
                         zoomControlsEnabled: false,
                         zoomGesturesEnabled: true,
-                        onMapCreated: (GoogleMapController controller) => _homeController.googleMapController.complete(controller),
+                        onMapCreated: (GoogleMapController controller) =>
+                            _homeController.googleMapController.complete(controller),
                       ),
                     );
                   }),

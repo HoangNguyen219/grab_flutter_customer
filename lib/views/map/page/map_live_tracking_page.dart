@@ -7,7 +7,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/common/widget/loading_widget.dart';
 import 'package:grab_customer_app/controllers/live_tracking_controller.dart';
 import 'package:grab_customer_app/models/ride.dart';
-import 'package:grab_customer_app/utils/location_service.dart';
 
 class MapLiveTrackingPage extends StatefulWidget {
   final Ride ride;
@@ -30,7 +29,6 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    LocationService.trackCurrentLocation(_liveTrackingController.getDirectionData, widget.ride);
   }
 
   @override
