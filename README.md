@@ -1,16 +1,43 @@
-# grab_customer_app
+# Grab Customer App
 
-A new Flutter project.
+## Yêu Cầu
 
-## Getting Started
+Để chạy dự án Flutter, bạn cần cài đặt các công cụ sau:
 
-This project is a starting point for a Flutter application.
+- **Flutter SDK**: Có thể tải từ [trang chủ Flutter](https://flutter.dev/docs/get-started/install).
+- **IDE hoặc Editor**: Ví dụ như Android Studio, Visual Studio Code, hoặc IntelliJ với plugin Flutter.
 
-A few resources to get you started if this is your first Flutter project:
+## Bước Chạy Dự Án
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. **Clone Repository**
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+git clone https://github.com/HoangNguyen219/grab_flutter_customer.git
+```
+
+2. **Mở Dự Án Trong IDE hoặc Editor**
+
+Mở thư mục của dự án với IDE hoặc Editor bạn đã cài đặt.
+
+3. **Cài Đặt Dependencies**
+
+Mở terminal trong thư mục dự án và chạy lệnh:
+
+```
+flutter pub get
+```
+
+4. **Chạy Ứng Dụng**
+
+- Để chạy ứng dụng trên thiết bị di động hoặc máy ảo, kết nối thiết bị hoặc mở máy ảo và chạy lệnh:
+
+```
+flutter run
+```
+
+- Nếu sử dụng Android Studio hoặc IntelliJ, bạn có thể chọn "Run" từ thanh công cụ hoặc sử dụng tổ hợp
+  phím `Shift + F10` (Windows) hoặc `Control + R` (macOS).
+
+- Trong Visual Studio Code, nhấn `F5` hoặc chọn "Run" từ thanh debug.
+
+
