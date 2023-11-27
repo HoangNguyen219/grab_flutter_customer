@@ -8,7 +8,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/controllers/auth_controller.dart';
-import 'package:grab_customer_app/controllers/home_controller.dart';
 import 'package:grab_customer_app/models/driver.dart';
 import 'package:grab_customer_app/models/map_direction.dart';
 import 'package:grab_customer_app/models/map_direction_api_model.dart';
@@ -169,7 +168,7 @@ class MapController extends GetxController {
   void _addDriverMarkers() {
     // Remove extra markers
     if (markers.length > 2) {
-      markers.removeRange(2, markers.length - 1);
+      markers.removeRange(2, markers.length);
     }
 
     // Filter and add nearby drivers
@@ -197,8 +196,6 @@ class MapController extends GetxController {
 
   void _addAcceptedDriverMarker() {
     // Remove extra markers
-    print("==================");
-    print(markers.length);
     if (markers.length > 2) {
       markers.removeRange(2, markers.length);
     }

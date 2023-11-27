@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/common/widget/loading_widget.dart';
 import 'package:grab_customer_app/controllers/live_tracking_controller.dart';
 import 'package:grab_customer_app/models/ride.dart';
+import 'package:grab_customer_app/utils/location_service.dart';
 
 class MapLiveTrackingPage extends StatefulWidget {
   final Ride ride;
@@ -29,7 +30,7 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _liveTrackingController.getDirectionData(widget.ride);
+    LocationService.trackCurrentLocation(_liveTrackingController.getDirectionData, widget.ride);
   }
 
   @override
@@ -129,29 +130,29 @@ class _MapLiveTrackingPageState extends State<MapLiveTrackingPage> {
                   ),
                 ],
               ),
-        floatingActionButton: Visibility(
-          visible: true,
-          child: GestureDetector(
-            onTap: () {
-              _liveTrackingController.getDirectionData(widget.ride);
-            },
-            child: Container(
-                width: 120,
-                decoration:
-                    const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(25)), color: Colors.black),
-                padding: const EdgeInsets.all(10),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Icon(Icons.refresh, color: Colors.white),
-                    Text(
-                      "Refresh",
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
-                    ),
-                  ],
-                )),
-          ),
-        ),
+        // floatingActionButton: Visibility(
+        //   visible: true,
+        //   child: GestureDetector(
+        //     onTap: () {
+        //       _liveTrackingController.getDirectionData(widget.ride);
+        //     },
+        //     child: Container(
+        //         width: 120,
+        //         decoration:
+        //             const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(25)), color: Colors.black),
+        //         padding: const EdgeInsets.all(10),
+        //         child: const Row(
+        //           mainAxisAlignment: MainAxisAlignment.spaceAround,
+        //           children: [
+        //             Icon(Icons.refresh, color: Colors.white),
+        //             Text(
+        //               "Refresh",
+        //               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
+        //             ),
+        //           ],
+        //         )),
+        //   ),
+        // ),
       ),
     );
   }

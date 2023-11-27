@@ -15,6 +15,7 @@ class SocketController extends GetxController {
 
   SocketController(this._socketService) {
     initSocket();
+    addCustomer();
   }
 
   Future<void> initSocket() async {
@@ -59,6 +60,7 @@ class SocketController extends GetxController {
   }
 
   void _onChangeLocationDriver(Driver driver) {
+    print("_onChangeLocationDriver");
     _mapController.updateAcceptedDriver(driver);
   }
 

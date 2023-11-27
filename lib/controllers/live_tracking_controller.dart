@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:grab_customer_app/models/map_direction.dart';
@@ -9,7 +10,6 @@ import 'package:grab_customer_app/models/map_direction_api_model.dart';
 import 'package:grab_customer_app/models/ride.dart';
 import 'package:grab_customer_app/services/map_api_service.dart';
 import 'package:grab_customer_app/utils/constants/ride_constants.dart';
-import 'package:grab_customer_app/utils/location_service.dart';
 
 class LiveTrackingController extends GetxController {
   final MapService _mapService;
@@ -30,15 +30,7 @@ class LiveTrackingController extends GetxController {
 
   LiveTrackingController(this._mapService);
 
-
-
-  getDirectionData(Ride ride) async {
-    final position = await LocationService.getLocation();
-
-    if (position == null) {
-      // Handle the case where the location permission is denied or null
-      return;
-    }
+  getDirectionData(Ride ride, Position position) async {
     liveLocLatitude.value = position.latitude;
     liveLocLongitude.value = position.longitude;
     destinationLat.value = ride.endLocation![RideConstants.lat];
