@@ -87,7 +87,7 @@ class SocketController extends GetxController {
   }
 
   void cancelRide(Ride ride) {
-    _socketService.cancel(ride.driverId!, _authController.customerId.value);
+    _socketService.cancel(ride.driverId, _authController.customerId.value);
     _mapController.resetForNewTrip();
     Get.snackbar("Trip Canceled", "The trip has been canceled.", snackPosition: SnackPosition.BOTTOM);
     Get.off(() => const RideHistoryPage());

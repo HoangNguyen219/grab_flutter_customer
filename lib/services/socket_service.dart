@@ -78,7 +78,7 @@ class SocketService {
     _sendMessage(SocketConstants.book, ride.toJson());
   }
 
-  void cancel(int driverId, int customerId) {
+  void cancel(int? driverId, int customerId) {
     _sendMessage(SocketConstants.cancel, {RideConstants.driverId: driverId, RideConstants.customerId: customerId});
   }
 
